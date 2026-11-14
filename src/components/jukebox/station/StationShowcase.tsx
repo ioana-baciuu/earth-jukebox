@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { Hand, Headphones, Keyboard, Monitor, RotateCcw, Vibrate, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ export function StationShowcase() {
   const { settings, announce } = useA11y();
   const [selected, setSelected] = useState<StationPartId | null>(null);
   const [ready, setReady] = useState(false);
+  const hotspotElements = useRef<Partial<Record<StationPartId, HTMLButtonElement | null>>>({});
   const part = STATION_PARTS.find((p) => p.id === selected);
   const select = (id: StationPartId | null) => {
     setSelected(id);
@@ -43,9 +44,24 @@ export function StationShowcase() {
         >
           <ClientOnly fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
             <Suspense fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
-              <Station3D selected={selected} onSelect={select} spin={!settings.calmMotion} onReady={() => setReady(true)} />
+              <Station3D selected={selected} hotspotElements={hotspotElements} spin={!settings.calmMotion} onReady={() => setReady(true)} />
             </Suspense>
           </ClientOnly>
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+            {STATION_PARTS.map((p) => (
+              <Button
+                key={p.id}
+                ref={(element) => { hotspotElements.current[p.id] = element; }}
+                variant="ghost"
+                size="icon"
+                tabIndex={-1}
+                aria-label={p.title}
+                aria-pressed={selected === p.id}
+                className="station-hotspot pointer-events-auto absolute left-0 top-0"
+                onClick={() => select(selected === p.id ? null : p.id)}
+              >{p.n}</Button>
+            ))}
+          </div>
           {part && (
             <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-lg border-2 border-primary bg-background/90 p-3 backdrop-blur" aria-hidden="true">
               <p className="font-display text-lg font-bold">{part.n}. {part.title}</p>

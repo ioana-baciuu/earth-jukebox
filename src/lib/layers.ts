@@ -16,7 +16,7 @@ import nasaCo2 from "@/assets/earth/nasa-co2.jpg.asset.json";
 
 export type LayerId = "rain" | "storm" | "ocean" | "lights" | "forest" | "dust" | "co2";
 
-export const LAYER_IDS: LayerId[] = ["rain", "storm", "ocean", "lights", "forest", "dust", "co2"];
+export const LAYER_IDS: LayerId[] = ["ocean", "storm", "forest", "lights"];
 
 export interface LayerInfo {
   id: LayerId;
@@ -75,7 +75,7 @@ export const LAYERS: Record<LayerId, LayerInfo> = {
   },
   ocean: {
     id: "ocean",
-    name: "Ocean warmth",
+    name: "Sea temperature",
     instrument: "Ocean waves",
     sound:
       "Waves wash in and out. Warm water sings a bright happy chord. Cold water sings low, and a whale may call.",
@@ -88,11 +88,11 @@ export const LAYERS: Record<LayerId, LayerInfo> = {
       "NASA Perpetual Ocean globe: swirling white lines of ocean currents over a deep blue Pacific, with Asia and Australia visible.",
     credit: "NASA SVS · Global Sea Surface Currents and Temperature · Perpetual Ocean 2",
     creditUrl: "https://svs.gsfc.nasa.gov/3912",
-    shortcut: "3",
+    shortcut: "1",
   },
   lights: {
     id: "lights",
-    name: "City lights",
+    name: "Night lights",
     instrument: "Music box",
     sound:
       "Twinkling music-box bells. Dark countryside is quiet; big bright cities sparkle with many notes.",
@@ -109,12 +109,12 @@ export const LAYERS: Record<LayerId, LayerInfo> = {
   },
   forest: {
     id: "forest",
-    name: "Forests",
+    name: "Forest height",
     instrument: "Birdsong",
     sound:
       "Leaves rustle and birds sing. Tall thick forests are full of birds and a cuckoo calls.",
     about:
-      "How tall and thick the trees are, measured with lasers from space by NASA's GEDI instrument.",
+      "NASA GEDI measures forest structure with lasers. In this demo the globe sound uses a vegetation-colour proxy, not calibrated tree height.",
     levels: ["no trees", "a few bushes", "a small wood", "a thick forest", "a giant rainforest"],
     skin: skinForest.url,
     image: nasaForest.url,
@@ -122,7 +122,7 @@ export const LAYERS: Record<LayerId, LayerInfo> = {
       "NASA GEDI globe of Africa and Europe where taller forests rise up in bright green bumps.",
     credit: "NASA SVS · GEDI Forest Height",
     creditUrl: "https://svs.gsfc.nasa.gov/4950",
-    shortcut: "5",
+    shortcut: "3",
   },
   dust: {
     id: "dust",

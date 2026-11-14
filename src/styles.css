@@ -208,7 +208,7 @@
   h3,
   .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
   :focus-visible {
     outline: 4px solid var(--ring);
@@ -371,3 +371,19 @@
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+
+/* Functional exhibit: material-like console, not a marketing illustration. */
+.museum-console { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); overflow:hidden; border:2px solid var(--border); border-radius:8px; background:var(--space); box-shadow:var(--shadow-card); }
+.museum-globe-zone { min-width:0; position:relative; background:var(--space); }
+.museum-globe-stage { height:420px; width:100%; }
+.museum-plinth { position:relative; margin:-35px auto 0; width:62%; min-height:82px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:var(--secondary); border:2px solid var(--border); border-radius:8px 8px 0 0; font-weight:700; }
+.museum-tablet-zone { display:flex; align-items:center; min-width:0; padding:24px; }
+.tablet-shell { width:100%; overflow:hidden; border:6px solid var(--border); border-radius:8px; background:var(--card); }
+.map-reticle { position:absolute; width:18px; height:18px; border:2px solid var(--foreground); transform:translate(-50%,-50%); box-shadow:0 0 0 1px var(--space); pointer-events:none; }
+.museum-controls { grid-column:1/-1; display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:24px; padding:22px; border-top:2px solid var(--border); background:var(--card); }
+.museum-dataset-button { border:2px solid var(--border); border-radius:8px; background:var(--secondary); }
+.museum-dataset-button[aria-pressed=true] { border-color:var(--layer); background:color-mix(in oklab,var(--layer) 12%,var(--secondary)); }
+.museum-dataset-symbol { display:grid; place-items:center; width:56px; height:56px; border-radius:50%; background:var(--layer); color:var(--layer-foreground); }
+.museum-joystick { text-align:center; border-left:1px solid var(--border); padding-left:20px; }
+.joystick-stick { width:36px; height:55px; display:block; border-radius:50% 50% 8px 8px; border:3px solid var(--border); background:var(--foreground); box-shadow:var(--shadow-card); transform:rotate(-8deg); }
+@media(max-width:800px) { .museum-console { grid-template-columns:1fr; } .museum-globe-stage { height:340px; } .museum-tablet-zone { padding:16px; } .museum-controls { grid-template-columns:1fr; padding:16px; } .museum-joystick { border-left:0; border-top:1px solid var(--border); padding:16px 0 0; } }

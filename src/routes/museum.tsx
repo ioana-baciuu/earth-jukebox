@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Ear, Hand, Headphones, Keyboard, Monitor, Repeat, School, Vibrate } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MuseumSimulator } from "@/components/jukebox/MuseumSimulator";
 
 export const Route = createFileRoute("/museum")({
   head: () => ({
@@ -22,19 +23,19 @@ export const Route = createFileRoute("/museum")({
 
 const PARTS = [
   { n: 1, icon: Hand, title: "Touch globe", text: "3D-printed raised continents and mountains. Touch sensors under the surface tell the app which place a child is touching." },
-  { n: 2, icon: Keyboard, title: "Big-button panel", text: "Four large buttons with Braille and raised symbols — rain drop, lightning bolt, wave, star — pick the sound. A joystick travels the globe; one button says ‘Where am I?’." },
+  { n: 2, icon: Keyboard, title: "Four-button panel", text: "Sea temperature, lightning, forest height and night lights. Raised symbols and professionally checked Braille identify the buttons. A one-axis joystick rotates east and west; north stays upright." },
   { n: 3, icon: Headphones, title: "Headphones", text: "Stereo headphones: places in the west sound in the left ear, east in the right. Higher notes mean north, lower notes mean south." },
-  { n: 4, icon: Vibrate, title: "Rumble pad", text: "A hand rest that vibrates for thunder and taps when a child crosses a coastline from sea onto land." },
-  { n: 5, icon: Monitor, title: "Companion screen", text: "Shows the NASA picture and big text for teachers, parents and low-vision visitors, so everyone shares the same moment." },
+  { n: 4, icon: Vibrate, title: "Thermal and vibration pad", text: "Proposed touch feedback: gentle warmth or coolness for sea temperature, vibration for thunder and coastlines. No physical temperature control is connected to this web demo." },
+  { n: 5, icon: Monitor, title: "Companion tablet", text: "Plays extracted NASA image sequences. Touching a flat map selects the same place on the globe and changes the sound. The rotating GEDI movie is a visual explanation, not a geographic touch map." },
 ];
 
 const FLOW = [
-  { t: "Welcome", d: "The station greets the visitor by voice and explains the four buttons. No reading needed." },
+  { t: "Welcome", d: "Choose a dataset and press Where am I? to hear the selected location." },
   { t: "Meet the sounds", d: "Each button plays ‘a little’ and ‘a lot’ so children learn one rule: more of something means more sound." },
-  { t: "Explore", d: "Touch the globe or move the joystick. Rain, thunder, waves and city bells change with the real NASA data." },
+  { t: "Explore", d: "Touch the globe or move the east/west joystick. Ocean waves, thunder, birds and bells respond to illustrative image-derived values." },
   { t: "Compare", d: "Guided lessons: Amazon vs Sahara, Congo vs Pacific, Gulf Stream vs Arctic, Tokyo vs open ocean." },
   { t: "Orchestra", d: "Turn every dataset on at once and hear the whole planet spin as music." },
-  { t: "Reset", d: "After a minute without touch, the station fades out and greets the next visitor." },
+  { t: "Reset", d: "Stop silences the headphones. Reset returns the station to its starting place." },
 ];
 
 const FEATURES = [
@@ -46,7 +47,7 @@ const FEATURES = [
   "Keyboard, number pad and screen-reader support",
   "Big text, high contrast and calm-motion settings",
   "Orchestra mode: every dataset as an instrument",
-  "Works offline — the NASA data is built in",
+  "48 extracted NASA frames per dataset with original source links",
 ];
 
 function KioskBlueprint() {
@@ -81,7 +82,7 @@ function KioskBlueprint() {
       </g>
       {/* buttons */}
       {[
-        ["layer-rain", 220],
+         ["layer-forest", 220],
         ["layer-storm", 285],
         ["layer-ocean", 350],
         ["layer-lights", 415],
@@ -125,18 +126,18 @@ function KioskBlueprint() {
 
 function ControlPanelBlueprint() {
   const keys = [
-    { cls: "layer-rain", label: "Rain", braille: "⠗⠁⠊⠝" },
+    { cls: "layer-forest", label: "Forest", braille: "⠞⠗⠑⠑" },
     { cls: "layer-storm", label: "Thunder", braille: "⠞⠓⠥⠝" },
     { cls: "layer-ocean", label: "Ocean", braille: "⠕⠉⠑⠁" },
     { cls: "layer-lights", label: "Lights", braille: "⠇⠊⠛⠓" },
   ];
   return (
-    <div className="surface p-6" role="img" aria-label="Control panel: four big round buttons labelled Rain, Thunder, Ocean and Lights in print and Braille, a joystick, a Where am I button and a Stop button.">
+     <div className="surface p-6" role="img" aria-label="Proposed control panel: four buttons for Forest, Thunder, Ocean and Lights; a joystick, Where am I and Stop. Braille is illustrative and requires review.">
       <div className="grid grid-cols-4 gap-4" aria-hidden="true">
         {keys.map((k) => (
           <div key={k.label} className={`${k.cls} flex flex-col items-center gap-2`}>
-            <span className="layer-chip h-20 w-20 rounded-full shadow-[var(--shadow-glow)]" />
-            <span className="text-lg font-bold">{k.label}</span>
+             <span className="layer-chip h-12 w-12 rounded-full shadow-[var(--shadow-glow)] sm:h-20 sm:w-20" />
+             <span className="text-sm font-bold sm:text-lg">{k.label}</span>
             <span className="text-2xl tracking-widest text-muted-foreground">{k.braille}</span>
           </div>
         ))}
@@ -149,7 +150,7 @@ function ControlPanelBlueprint() {
           <span className="font-bold">Joystick</span>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <span className="h-14 w-32 rounded-2xl bg-primary" />
+           <span className="h-14 w-20 rounded-2xl bg-primary sm:w-32" />
           <span className="font-bold">Where am I?</span>
         </div>
         <div className="flex flex-col items-center gap-2">
@@ -167,11 +168,12 @@ function MuseumPage() {
       <p className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5 text-sm font-bold text-muted-foreground">
         <School className="h-4 w-4 text-primary" aria-hidden="true" /> Prototype for museums and schools
       </p>
-      <h1 className="mt-4 font-display text-5xl font-bold sm:text-6xl">The Earth Jukebox station</h1>
+       <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">Earth Jukebox museum station</h1>
       <p className="mt-4 max-w-3xl text-xl text-muted-foreground">
-        A touch-and-listen exhibit where blind and low-vision children explore real NASA Earth data with their hands
-        and ears. The app on this website is the software that runs inside it.
+         CYSA Sphere · A working digital prototype for blind and low-vision explorers.
       </p>
+
+       <div className="mt-8"><MuseumSimulator /></div>
 
       <section aria-labelledby="station-title" className="mt-10 grid items-start gap-8 lg:grid-cols-[1.2fr_1fr]">
         <div className="surface p-4 sm:p-6">
@@ -201,8 +203,7 @@ function MuseumPage() {
         <div>
           <h2 id="panel-title" className="font-display text-4xl font-bold">The control panel</h2>
           <p className="mt-3 text-lg text-muted-foreground">
-            Four NASA datasets, four buttons. Each has a different shape, colour and Braille label, so children can find
-            them by touch. On a laptop, the number keys 1–4, arrows and C do the same.
+             Four NASA datasets, four buttons. The physical panel proposes raised symbols and Braille; the web demo uses labelled controls. The joystick stays on one axis so the North Pole never tips over.
           </p>
         </div>
         <ControlPanelBlueprint />

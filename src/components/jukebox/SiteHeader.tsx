@@ -12,14 +12,14 @@ const NAV = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
         <Link to="/" className="flex items-center gap-2 rounded-full pr-2" aria-label="Earth Jukebox home">
           <span className="grid h-11 w-11 place-items-center rounded-full bg-primary text-primary-foreground">
             <Disc3 className="h-6 w-6 animate-[spin_8s_linear_infinite]" aria-hidden="true" />
           </span>
           <span className="font-display text-xl font-bold tracking-tight sm:text-2xl">Earth Jukebox</span>
         </Link>
-        <nav aria-label="Main" className="ml-auto">
+        <nav aria-label="Main" className="order-3 w-full overflow-x-auto sm:order-none sm:ml-auto sm:w-auto">
           <ul className="flex items-center gap-1">
             {NAV.map((n) => (
               <li key={n.to}>

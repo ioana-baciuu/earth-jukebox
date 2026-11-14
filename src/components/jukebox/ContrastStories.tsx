@@ -7,9 +7,9 @@ import { LayerIcon } from "./layer-icon";
 
 const STORIES: { title: string; question: string; layer: LayerId; a: Place; b: Place }[] = [
   {
-    title: "Wet or dry?",
-    question: "Why does it pour in the rainforest but stay silent in the desert?",
-    layer: "rain",
+    title: "Forest or desert?",
+    question: "Compare the forest sound with a place that has few trees.",
+    layer: "forest",
     a: { name: "Amazon Rainforest", lat: -3.5, lng: -62, blurb: "" },
     b: { name: "Sahara Desert", lat: 23, lng: 12, blurb: "" },
   },

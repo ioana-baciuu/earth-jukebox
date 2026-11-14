@@ -639,7 +639,7 @@ export class AudioEngine {
 
   /** Set how loud each instrument is (0 = off). */
   setMix(mix: Partial<Record<LayerId, number>>, ramp = 0.8) {
-    for (const id of LAYER_IDS) this.voices.get(id)!.setLevel(mix[id] ?? 0, ramp);
+    for (const id of LAYER_IDS) this.voices.get(id)?.setLevel(mix[id] ?? 0, ramp);
   }
 
   stopAll(ramp = 0.8) {

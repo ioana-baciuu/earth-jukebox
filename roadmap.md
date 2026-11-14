@@ -1,4 +1,8 @@
 # Earth Jukebox roadmap
+- [x] Functional museum globe and companion tablet simulator
+- [x] Restrict dataset controls to sea temperature, lightning, forest height and night lights
+- [x] Download official NASA movies, extract frames and retain source manifests
+- [x] Verify playback, touch sonification and longitude-only controls
 - [x] Real 3D Earth globe with NASA skins per layer
 - [x] Click → NASA image pop-up + sound starts
 - [x] Child-friendly sonification (rain drops, thunder, waves, bells, birds, wind, CO2 drone)

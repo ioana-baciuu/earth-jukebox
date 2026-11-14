@@ -11,6 +11,9 @@ import { levelIndex } from "@/lib/sonify-map";
 import { cn } from "@/lib/utils";
 import { LayerIcon } from "./layer-icon";
 import { SoundBars } from "./SoundBars";
+import { NasaTablet } from "./NasaTablet";
+import { sampleEarth } from "@/lib/earth-data";
+import { describePlace } from "@/lib/places";
 
 export interface Spot {
   name: string;
@@ -69,9 +72,12 @@ export function DiscoveryDialog({
   const [everything, setEverything] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [flash, setFlash] = useState(0);
+  const [probeSpot, setProbeSpot] = useState<Spot | null>(null);
+  const currentSpot = probeSpot ?? spot;
+  useEffect(() => { setProbeSpot(null); }, [spot, layer]);
   const info = LAYERS[layer];
-  const value = spot ? layerStrength(layer, spot.sample) : 0;
-  const word = spot ? levelWord(layer, spot.sample) : "";
+  const value = currentSpot ? layerStrength(layer, currentSpot.sample) : 0;
+  const word = currentSpot ? levelWord(layer, currentSpot.sample) : "";
   const calmRef = useRef(settings.calmMotion);
   calmRef.current = settings.calmMotion;
 
@@ -81,7 +87,7 @@ export function DiscoveryDialog({
     let cancelled = false;
     getEngine().then((e) => {
       if (cancelled) return;
-      e.setSample(spot.sample);
+      e.setSample(currentSpot?.sample ?? spot.sample);
       if (everything) {
         const mix: Partial<Record<LayerId, number>> = {};
         for (const id of LAYER_IDS) mix[id] = id === layer ? 1 : 0.65;
@@ -92,12 +98,12 @@ export function DiscoveryDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, spot, layer, everything]);
+  }, [open, spot, currentSpot, layer, everything]);
 
   // Narrate
   useEffect(() => {
     if (!open || !spot) return;
-    const text = `${spot.name}. ${info.name}: ${word}. ${info.sound}`;
+    const text = `${currentSpot?.name ?? spot.name}. ${info.name}: ${word}. ${info.sound}`;
     speak(text);
     announce(`${spot.name}. ${info.name}: ${word}.`);
   }, [open, spot, layer]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -127,7 +133,7 @@ export function DiscoveryDialog({
   }, [open, stopSpeaking]);
 
   const pct = Math.round(value * 100);
-  const coords = useMemo(() => (spot ? formatCoords(spot.lat, spot.lng) : ""), [spot]);
+  const coords = useMemo(() => (currentSpot ? formatCoords(currentSpot.lat, currentSpot.lng) : ""), [currentSpot]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -138,13 +144,9 @@ export function DiscoveryDialog({
         )}
       >
         <div className="relative overflow-hidden rounded-t-3xl">
-          <img
-            src={info.image}
-            alt={info.imageAlt}
-            className="aspect-[16/8] w-full object-cover"
-            width={1024}
-            height={512}
-          />
+          {spot && <NasaTablet layer={layer} lat={currentSpot?.lat ?? spot.lat} lng={currentSpot?.lng ?? spot.lng}
+            onFrame={value => { if(value===undefined || !spot)return;setProbeSpot(prev=>{const base=prev??spot;if(base.sample[layer]===value)return prev;return {...base,sample:{...base.sample,[layer]:value}};}); }}
+            onProbe={(lat,lng,value,narrate) => { const sample=sampleEarth(lat,lng); if(value!==undefined)sample[layer]=value;const name=describePlace(lat,lng,sample.land>0.5);setProbeSpot({lat,lng,sample,name});if(narrate){speak(`${name}. ${info.name}: ${levelWord(layer,sample)}.`);announce(name);} }} />}
           {flash > 0 && (
             <div
               key={flash}
@@ -152,16 +154,12 @@ export function DiscoveryDialog({
               className="pointer-events-none absolute inset-0 animate-flash bg-foreground"
             />
           )}
-          <span className="layer-chip absolute left-4 top-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-base font-bold">
-            <LayerIcon id={layer} className="h-5 w-5" />
-            {info.name}
-          </span>
         </div>
 
         <div className="space-y-6 p-6 sm:p-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <DialogTitle className="font-display text-3xl font-bold sm:text-4xl">{spot?.name}</DialogTitle>
+              <DialogTitle className="font-display text-3xl font-bold sm:text-4xl">{currentSpot?.name}</DialogTitle>
               <p className="mt-1 text-base text-muted-foreground">{coords}</p>
             </div>
             <SoundBars playing={playing} calm={settings.calmMotion} />

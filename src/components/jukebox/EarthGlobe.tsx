@@ -4,6 +4,7 @@ import { Moon, Sun, Sunrise } from "lucide-react";
 import bumpAsset from "@/assets/earth/earth-bump.jpg.asset.json";
 import skyAsset from "@/assets/earth/night-sky.jpg.asset.json";
 import type { LayerId } from "@/lib/layers";
+import { DAY_PHASE_LABEL, dayPhase, nightShare } from "@/lib/museum-model";
 
 /** WebGL needs plain colours; these mirror the --layer-* tokens in styles.css. */
 const RING_RGB: Record<LayerId | "base", string> = {
@@ -57,19 +58,6 @@ function geoVector(lat: number, lng: number): [number, number, number] {
   return [Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta)];
 }
 
-/** Sun elevation (cosine) at a place: >0 day, <0 night. */
-function sunCosine(lat: number, lng: number, sun: { lat: number; lng: number }) {
-  const a = geoVector(lat, lng), b = geoVector(sun.lat, sun.lng);
-  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
-
-type Phase = "day" | "twilight" | "night";
-function phaseOf(c: number): Phase { return c > 0.1 ? "day" : c < -0.1 ? "night" : "twilight"; }
-const PHASE_LABEL: Record<Phase, string> = {
-  day: "Day Side — Sunlight",
-  twilight: "Twilight — Sunrise / Sunset Line",
-  night: "Night Side — City Lights Active",
-};
 
 export interface GlobeHandle {
   flyTo: (lat: number, lng: number, altitude?: number, ms?: number) => void;
@@ -241,9 +229,8 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
     uniformsRef.current?.sunDirection.value.set(...geoVector(sunPosition.lat, sunPosition.lng));
   }, [ready, sunPosition]);
 
-  const viewCos = sunPosition ? sunCosine(view.lat, view.lng, sunPosition) : 1;
-  const phase = phaseOf(viewCos);
-  const nightShare = Math.round(((1 - viewCos) / 2) * 100);
+  const phase = sunPosition ? dayPhase(view.lat, view.lng, sunPosition) : "day";
+  const nightPct = sunPosition ? nightShare(view.lat, view.lng, sunPosition) : 0;
   const sunHours = sunPosition ? (((12 + (view.lng - sunPosition.lng) / 15) % 24) + 24) % 24 : 12;
   const sunTime = `${String(Math.floor(sunHours)).padStart(2, "0")}:${String(Math.floor((sunHours % 1) * 60)).padStart(2, "0")}`;
 
@@ -273,15 +260,15 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
           <div className="daynight-badge" data-phase={phase} aria-hidden="true">
             <span className="flex items-center gap-2 text-sm font-bold">
               {phase === "night" ? <Moon className="h-4 w-4 text-primary" /> : phase === "day" ? <Sun className="h-4 w-4 text-accent" /> : <Sunrise className="h-4 w-4 text-primary" />}
-              {PHASE_LABEL[phase]}
+              {DAY_PHASE_LABEL[phase]}
             </span>
-            <span className="daynight-meter"><span style={{ width: `${nightShare}%` }} /></span>
+            <span className="daynight-meter"><span style={{ width: `${nightPct}%` }} /></span>
             <span className="flex justify-between gap-3 text-xs text-muted-foreground">
-              <span>{nightShare}% of this view in night</span>
+              <span>{nightPct}% of this view in night</span>
               <span>Sun time {sunTime}</span>
             </span>
           </div>
-          <p className="sr-only" aria-live="polite">{PHASE_LABEL[phase]}</p>
+          <p className="sr-only" aria-live="polite">{DAY_PHASE_LABEL[phase]}</p>
         </>
       )}
     </div>

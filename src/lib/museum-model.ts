@@ -22,6 +22,26 @@ export function isDaylight(lat: number, lng: number, sun: { lat: number; lng: nu
   const r = Math.PI / 180;
   return Math.sin(lat*r)*Math.sin(sun.lat*r)+Math.cos(lat*r)*Math.cos(sun.lat*r)*Math.cos((lng-sun.lng)*r) > 0;
 }
+/** Sun elevation cosine at a place: 1 = Sun overhead, -1 = midnight. */
+export function sunCosine(lat: number, lng: number, sun: { lat: number; lng: number }) {
+  const r = Math.PI / 180;
+  return Math.sin(lat*r)*Math.sin(sun.lat*r)+Math.cos(lat*r)*Math.cos(sun.lat*r)*Math.cos((lng-sun.lng)*r);
+}
+export type DayPhase = "day" | "twilight" | "night";
+export const DAY_PHASE_LABEL: Record<DayPhase, string> = {
+  day: "Day Side — Sunlight",
+  twilight: "Twilight — Sunrise / Sunset Line",
+  night: "Night Side — City Lights Active",
+};
+/** What the visitor faces: day, the sunrise/sunset band, or the night side with city lights. */
+export function dayPhase(lat: number, lng: number, sun: { lat: number; lng: number }): DayPhase {
+  const c = sunCosine(lat, lng, sun);
+  return c > 0.1 ? "day" : c < -0.1 ? "night" : "twilight";
+}
+/** Share (0-100) of the visible half of the globe that is in night. */
+export function nightShare(lat: number, lng: number, sun: { lat: number; lng: number }) {
+  return Math.round(((1 - sunCosine(lat, lng, sun)) / 2) * 100);
+}
 export function museumSnapshot(layer: MuseumLayer, lat: number, lng: number, value?: number) {
   const sample = sampleEarth(lat, lng);
   if (value !== undefined) sample[layer] = Math.max(0, Math.min(1, value));

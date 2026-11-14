@@ -23,7 +23,6 @@ export type EngineEvent = { layer: LayerId; kind: "thunder" | "drop" | "bell" | 
 type Listener = (e: EngineEvent) => void;
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
-const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 
 function makeNoise(ctx: AudioContext, seconds: number, color: "white" | "pink" | "brown") {
   const len = Math.floor(ctx.sampleRate * seconds);
@@ -289,7 +288,6 @@ class OceanVoice extends Voice {
     this.padGain.gain.setTargetAtTime(0.05 + 0.06 * this.presence(), t, 1);
   }
   schedule(from: number, to: number) {
-    const ctx = this.ctx;
     const pres = this.presence();
     if (this.nextWave < from) this.nextWave = from + 0.1;
     while (this.nextWave < to) {
@@ -309,7 +307,6 @@ class OceanVoice extends Voice {
         this.nextWhale += rand(9, 15);
       }
     }
-    void ctx;
   }
   private whale(t: number) {
     const ctx = this.ctx;
@@ -629,8 +626,7 @@ export class AudioEngine {
     return () => this.listeners.delete(fn);
   }
   emit(e: EngineEvent) {
-    const delay = Math.max(0, (this.ctx.currentTime && 0) || 0);
-    setTimeout(() => this.listeners.forEach((l) => l(e)), delay);
+    setTimeout(() => this.listeners.forEach((l) => l(e)), 0);
   }
 
   /** Feed the latest data sample to every voice. */
@@ -775,4 +771,3 @@ export async function getEngine(): Promise<AudioEngine> {
 export function peekEngine() {
   return engine;
 }
-void pick;

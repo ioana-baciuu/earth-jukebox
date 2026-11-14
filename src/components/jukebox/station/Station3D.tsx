@@ -1,8 +1,7 @@
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Html, Lightformer, OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import skinDay from "@/assets/earth/skin-day.jpg.asset.json";
 import bump from "@/assets/earth/earth-bump.jpg.asset.json";
 import sst from "@/assets/earth/nasa-sst.jpg.asset.json";
@@ -277,7 +276,7 @@ function Pedestal() {
   );
 }
 
-function Highlighter({ groups, selected }: { groups: React.RefObject<Partial<Record<StationPartId, THREE.Group | null>>>; selected: StationPartId | null }) {
+function Highlighter({ groups, selected }: { groups: RefObject<Partial<Record<StationPartId, THREE.Group | null>>>; selected: StationPartId | null }) {
   const pink = useMemo(() => new THREE.Color(C.pink), []);
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
   useEffect(() => {
@@ -286,7 +285,7 @@ function Highlighter({ groups, selected }: { groups: React.RefObject<Partial<Rec
     const g = selected ? groups.current?.[selected] : null;
     g?.traverse((o) => {
       const m = (o as THREE.Mesh).material;
-      if (m instanceof THREE.MeshStandardMaterial && !m.toneMapped === false) {
+      if (m instanceof THREE.MeshStandardMaterial && m.toneMapped) {
         m.emissive = pink;
         mats.current.push(m);
       }
@@ -300,7 +299,7 @@ function Highlighter({ groups, selected }: { groups: React.RefObject<Partial<Rec
 }
 
 function CameraRig({ selected }: { selected: StationPartId | null }) {
-  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null;
+  const controls = useThree((s) => s.controls) as unknown as { target: THREE.Vector3; update: () => void } | null;
   const camera = useThree((s) => s.camera);
   const moving = useRef(true);
   const goal = useMemo(() => {

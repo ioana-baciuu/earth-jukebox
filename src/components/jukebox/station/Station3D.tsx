@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Html, Lightformer, OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import skinDay from "@/assets/earth/skin-day.jpg.asset.json";
 import bump from "@/assets/earth/earth-bump.jpg.asset.json";
@@ -331,14 +331,29 @@ function ReadyFlag({ onReady }: { onReady: () => void }) {
   return null;
 }
 
+/** Project labels into the page's existing React root instead of creating nested roots. */
+function HotspotPositions({ elements }: { elements: RefObject<Partial<Record<StationPartId, HTMLButtonElement | null>>> }) {
+  const point = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ camera, size }) => {
+    for (const part of STATION_PARTS) {
+      const element = elements.current[part.id];
+      if (!element) continue;
+      point.set(...ANCHORS[part.id].label).project(camera);
+      element.style.transform = `translate(-50%, -50%) translate(${(point.x + 1) * size.width / 2}px, ${(1 - point.y) * size.height / 2}px)`;
+      element.style.visibility = point.z > -1 && point.z < 1 ? "visible" : "hidden";
+    }
+  });
+  return null;
+}
+
 export default function Station3D({
   selected,
-  onSelect,
+  hotspotElements,
   spin,
   onReady,
 }: {
   selected: StationPartId | null;
-  onSelect: (id: StationPartId) => void;
+  hotspotElements: RefObject<Partial<Record<StationPartId, HTMLButtonElement | null>>>;
   spin: boolean;
   onReady: () => void;
 }) {
@@ -376,20 +391,7 @@ export default function Station3D({
         <circleGeometry args={[2.2, 64]} />
         <meshStandardMaterial color={C.navy} roughness={0.95} />
       </mesh>
-      {STATION_PARTS.map((p) => (
-        <Html key={p.id} position={ANCHORS[p.id].label} center zIndexRange={[20, 0]}>
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-hidden="true"
-            className="station-hotspot"
-            aria-pressed={selected === p.id}
-            onClick={() => onSelect(p.id)}
-          >
-            {p.n}
-          </button>
-        </Html>
-      ))}
+      <HotspotPositions elements={hotspotElements} />
       <Highlighter groups={groups} selected={selected} />
       <OrbitControls makeDefault enablePan={false} minDistance={0.8} maxDistance={4.5} minPolarAngle={0.3} maxPolarAngle={1.5} target={OVERVIEW.target.toArray()} />
       <CameraRig selected={selected} />

@@ -1,5 +1,5 @@
 # Earth Jukebox roadmap
-- [ ] Remove the prototype outline, place the support behind the globe, and integrate touch feedback into the globe
+- [x] Remove the prototype outline, place the support behind the globe, and integrate touch feedback into the globe
 - [x] Finish station label warning cleanup and darker night hemisphere
 - [x] Verify museum controls, NASA playback and five-part model on desktop and mobile
 - [x] Record station architecture in project notes

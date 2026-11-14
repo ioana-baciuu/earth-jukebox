@@ -62,7 +62,7 @@ function useWood() {
   });
 }
 
-/** 1 · Tactile touch globe with real NASA skin, relief bump and LED sun ring. */
+/** 1 · Tactile touch globe with real NASA skin and relief bump, seated on its cradle. */
 function TouchGlobe({ spin }: { spin: boolean }) {
   const { map, bumpMap } = useTexture({ map: skinDay.url, bumpMap: bump.url });
   map.colorSpace = THREE.SRGBColorSpace;
@@ -75,15 +75,6 @@ function TouchGlobe({ spin }: { spin: boolean }) {
       <mesh ref={earth} castShadow>
         <sphereGeometry args={[0.3, 96, 64]} />
         <meshStandardMaterial map={map} bumpMap={bumpMap} bumpScale={6} roughness={0.75} metalness={0.02} />
-      </mesh>
-      {/* Rear-mounted north-up support leaves the touch surface unobstructed. */}
-      <mesh position={[0, 0, -0.35]}>
-        <cylinderGeometry args={[0.006, 0.006, 0.7, 12]} />
-        <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, -0.34, -0.175]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.35, 12]} />
-        <meshStandardMaterial color={C.steel} metalness={0.85} roughness={0.25} />
       </mesh>
       {/* cradle */}
       <mesh position={[0, -0.31, 0]}>
@@ -144,7 +135,9 @@ function Headphones() {
     () =>
       new THREE.TubeGeometry(
         new THREE.CatmullRomCurve3([
-          new THREE.Vector3(-0.62, 0.52, 0.19),
+          // The rotated earcup centre is (-0.63, 0.61, 0.19), radius 0.045.
+          new THREE.Vector3(-0.63, 0.568, 0.19),
+          new THREE.Vector3(-0.63, 0.53, 0.19),
           new THREE.Vector3(-0.64, 0.35, 0.24),
           new THREE.Vector3(-0.58, 0.28, 0.2),
           new THREE.Vector3(-0.555, 0.4, 0.1),
@@ -180,6 +173,11 @@ function Headphones() {
           </group>
         ))}
       </group>
+      {/* Strain relief overlaps both the earcup shell and the cable endpoint. */}
+      <mesh position={[-0.63, 0.564, 0.19]}>
+        <cylinderGeometry args={[0.009, 0.007, 0.026, 12]} />
+        <meshStandardMaterial color={C.rubber} roughness={0.7} />
+      </mesh>
       <mesh geometry={cable}>
         <meshStandardMaterial color={C.rubber} roughness={0.7} />
       </mesh>

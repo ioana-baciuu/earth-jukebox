@@ -40,7 +40,7 @@ export function StationShowcase() {
           className="station-stage"
           data-scene-ready={ready ? "true" : undefined}
           role="img"
-          aria-label="3D model of the Earth Jukebox Station: a wooden pedestal with a raised touch globe and rear support, a sloped panel with four Braille buttons and an east–west joystick, headphones on a side hook, thermal and vibration feedback integrated into the globe’s surface, and a tablet on an arm to the right."
+          aria-label="3D model of the Earth Jukebox Station: a wooden pedestal with a raised touch globe seated on a cradle, a sloped panel with four Braille buttons and an east–west joystick, cabled headphones on a side hook, thermal and vibration feedback integrated into the globe’s surface, and a tablet on an arm to the right."
         >
           <ClientOnly fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
             <Suspense fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>

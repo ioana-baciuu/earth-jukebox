@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Sound is synthesized live with Web Audio in `src/lib/audio/engine.ts` (one voice per Earth layer); keep pure value→sound rules in `src/lib/sonify-map.ts` so they stay unit-tested.
+- Earth data comes from offline-extracted 2.5° grids in `src/data/earth-grids.ts` (generated from NASA SVS frames); regenerate rather than hand-edit.
+- The globe (`globe.gl`) is imported dynamically inside useEffect because WebGL cannot run during SSR.
+- WebGL ring colours in `EarthGlobe.tsx` mirror the `--layer-*` tokens in `src/styles.css`; update both together.

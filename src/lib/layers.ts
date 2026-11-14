@@ -114,7 +114,7 @@ export const LAYERS: Record<LayerId, LayerInfo> = {
     sound:
       "Leaves rustle and birds sing. Tall thick forests are full of birds and a cuckoo calls.",
     about:
-      "How tall and thick the trees are, measured with lasers from space by NASA's GEDI instrument.",
+      "NASA GEDI measures forest structure with lasers. In this demo the globe sound uses a vegetation-colour proxy, not calibrated tree height.",
     levels: ["no trees", "a few bushes", "a small wood", "a thick forest", "a giant rainforest"],
     skin: skinForest.url,
     image: nasaForest.url,

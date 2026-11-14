@@ -33,7 +33,7 @@ interface Props {
   onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
   onReady?: () => void;
   lockedAxis?: boolean;
-  sunPosition?: { lat: number; lng: number };
+  sunPosition?: { lat: number; lng: number } | undefined;
 }
 
 export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(

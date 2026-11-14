@@ -76,8 +76,8 @@ export function DiscoveryDialog({
   const currentSpot = probeSpot ?? spot;
   useEffect(() => { setProbeSpot(null); }, [spot, layer]);
   const info = LAYERS[layer];
-  const value = spot ? layerStrength(layer, spot.sample) : 0;
-  const word = spot ? levelWord(layer, spot.sample) : "";
+  const value = currentSpot ? layerStrength(layer, currentSpot.sample) : 0;
+  const word = currentSpot ? levelWord(layer, currentSpot.sample) : "";
   const calmRef = useRef(settings.calmMotion);
   calmRef.current = settings.calmMotion;
 
@@ -103,7 +103,7 @@ export function DiscoveryDialog({
   // Narrate
   useEffect(() => {
     if (!open || !spot) return;
-    const text = `${spot.name}. ${info.name}: ${word}. ${info.sound}`;
+    const text = `${currentSpot?.name ?? spot.name}. ${info.name}: ${word}. ${info.sound}`;
     speak(text);
     announce(`${spot.name}. ${info.name}: ${word}.`);
   }, [open, spot, layer]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -133,7 +133,7 @@ export function DiscoveryDialog({
   }, [open, stopSpeaking]);
 
   const pct = Math.round(value * 100);
-  const coords = useMemo(() => (spot ? formatCoords(spot.lat, spot.lng) : ""), [spot]);
+  const coords = useMemo(() => (currentSpot ? formatCoords(currentSpot.lat, currentSpot.lng) : ""), [currentSpot]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -145,6 +145,7 @@ export function DiscoveryDialog({
       >
         <div className="relative overflow-hidden rounded-t-3xl">
           {spot && <NasaTablet layer={layer} lat={currentSpot?.lat ?? spot.lat} lng={currentSpot?.lng ?? spot.lng}
+            onFrame={value => { if(value===undefined || !spot)return;setProbeSpot(prev=>{const base=prev??spot;if(base.sample[layer]===value)return prev;return {...base,sample:{...base.sample,[layer]:value}};}); }}
             onProbe={(lat,lng,value,narrate) => { const sample=sampleEarth(lat,lng); if(value!==undefined)sample[layer]=value;const name=describePlace(lat,lng,sample.land>0.5);setProbeSpot({lat,lng,sample,name});if(narrate){speak(`${name}. ${info.name}: ${levelWord(layer,sample)}.`);announce(name);} }} />}
           {flash > 0 && (
             <div

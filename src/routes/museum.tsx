@@ -82,7 +82,7 @@ function KioskBlueprint() {
       </g>
       {/* buttons */}
       {[
-        ["layer-rain", 220],
+         ["layer-forest", 220],
         ["layer-storm", 285],
         ["layer-ocean", 350],
         ["layer-lights", 415],
@@ -132,12 +132,12 @@ function ControlPanelBlueprint() {
     { cls: "layer-lights", label: "Lights", braille: "⠇⠊⠛⠓" },
   ];
   return (
-    <div className="surface p-6" role="img" aria-label="Control panel: four big round buttons labelled Rain, Thunder, Ocean and Lights in print and Braille, a joystick, a Where am I button and a Stop button.">
+     <div className="surface p-6" role="img" aria-label="Proposed control panel: four buttons for Forest, Thunder, Ocean and Lights; a joystick, Where am I and Stop. Braille is illustrative and requires review.">
       <div className="grid grid-cols-4 gap-4" aria-hidden="true">
         {keys.map((k) => (
           <div key={k.label} className={`${k.cls} flex flex-col items-center gap-2`}>
-            <span className="layer-chip h-20 w-20 rounded-full shadow-[var(--shadow-glow)]" />
-            <span className="text-lg font-bold">{k.label}</span>
+             <span className="layer-chip h-12 w-12 rounded-full shadow-[var(--shadow-glow)] sm:h-20 sm:w-20" />
+             <span className="text-sm font-bold sm:text-lg">{k.label}</span>
             <span className="text-2xl tracking-widest text-muted-foreground">{k.braille}</span>
           </div>
         ))}
@@ -150,7 +150,7 @@ function ControlPanelBlueprint() {
           <span className="font-bold">Joystick</span>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <span className="h-14 w-32 rounded-2xl bg-primary" />
+           <span className="h-14 w-20 rounded-2xl bg-primary sm:w-32" />
           <span className="font-bold">Where am I?</span>
         </div>
         <div className="flex flex-col items-center gap-2">

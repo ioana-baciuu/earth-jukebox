@@ -32,10 +32,12 @@ interface Props {
   onPick: (lat: number, lng: number) => void;
   onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
   onReady?: () => void;
+  lockedAxis?: boolean;
+  sunPosition?: { lat: number; lng: number };
 }
 
 export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
-  { skinUrl, layer, cursor, autoRotate, calmMotion, label, onPick, onKeyDown, onReady },
+  { skinUrl, layer, cursor, autoRotate, calmMotion, label, onPick, onKeyDown, onReady, lockedAxis = false, sunPosition },
   ref,
 ) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -52,13 +54,13 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
       const g = globeRef.current;
       if (!g) return;
       g.controls().autoRotate = false;
-      g.pointOfView({ lat, lng, altitude }, calmMotion ? 0 : ms);
+      g.pointOfView({ lat: lockedAxis ? 12 : lat, lng, altitude }, calmMotion ? 0 : ms);
     },
     follow: (lat, lng, ms) => {
       const g = globeRef.current;
       if (!g) return;
       g.controls().autoRotate = false;
-      g.pointOfView({ lat, lng, altitude: 2.1 }, ms);
+      g.pointOfView({ lat: lockedAxis ? 12 : lat, lng, altitude: 2.1 }, ms);
     },
     focus: () => wrapRef.current?.focus(),
   }));
@@ -133,7 +135,34 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
     const g = globeRef.current;
     if (!g) return;
     g.controls().autoRotate = autoRotate && !calmMotion;
-  }, [autoRotate, calmMotion, ready]);
+    if (lockedAxis) {
+      const polar = (90 - 12) * Math.PI / 180;
+      g.controls().minPolarAngle = polar;
+      g.controls().maxPolarAngle = polar;
+      g.controls().enablePan = false;
+    }
+  }, [autoRotate, calmMotion, ready, lockedAxis]);
+
+  useEffect(() => {
+    const g = globeRef.current;
+    if (!g || !sunPosition) return;
+    // Hemisphere cap centered opposite the Sun: real-time solar geometry, not NASA live imagery.
+    g.polygonCapColor("rgba(0,0,0,0.62)").polygonSideColor("rgba(0,0,0,0)")
+      .polygonStrokeColor("rgba(255,221,87,0.5)").polygonAltitude(0.004);
+    const phi = sunPosition.lat * Math.PI / 180, lambda = sunPosition.lng * Math.PI / 180;
+    const s = [Math.cos(phi)*Math.cos(lambda), Math.cos(phi)*Math.sin(lambda), Math.sin(phi)];
+    const u = [-Math.sin(lambda), Math.cos(lambda), 0];
+    const v = [-Math.sin(phi)*Math.cos(lambda), -Math.sin(phi)*Math.sin(lambda), Math.cos(phi)];
+    const coordinates: number[][] = [];
+    for (let i=0;i<=120;i++) {
+      const t=i/120*2*Math.PI;
+      const x=(u[0]??0)*Math.cos(t)+(v[0]??0)*Math.sin(t)-0.002*(s[0]??0);
+      const y=(u[1]??0)*Math.cos(t)+(v[1]??0)*Math.sin(t)-0.002*(s[1]??0);
+      const z=(u[2]??0)*Math.cos(t)+(v[2]??0)*Math.sin(t)-0.002*(s[2]??0);
+      coordinates.push([Math.atan2(y,x)*180/Math.PI,Math.atan2(z,Math.hypot(x,y))*180/Math.PI]);
+    }
+    g.polygonsData([{ type:"Feature", geometry:{type:"Polygon",coordinates:[coordinates]},properties:{} }]);
+  }, [ready, sunPosition]);
 
   useEffect(() => {
     const g = globeRef.current;

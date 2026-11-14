@@ -1,6 +1,6 @@
 # Earth Jukebox roadmap
-- [ ] Finish station label warning cleanup and darker night hemisphere
-- [ ] Verify museum controls, NASA playback and five-part model on desktop and mobile
+- [x] Finish station label warning cleanup and darker night hemisphere
+- [x] Verify museum controls, NASA playback and five-part model on desktop and mobile
 - [x] Record station architecture in project notes
 - [x] Functional museum globe and companion tablet simulator
 - [x] Restrict dataset controls to sea temperature, lightning, forest height and night lights

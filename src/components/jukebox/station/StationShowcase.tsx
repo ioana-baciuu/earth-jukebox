@@ -62,14 +62,14 @@ export function StationShowcase() {
               >{p.n}</Button>
             ))}
           </div>
+        </div>
+        <div className="flex flex-col gap-3">
           {part && (
-            <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-lg border-2 border-primary bg-background/90 p-3 backdrop-blur" aria-hidden="true">
+            <div className="border-l-2 border-primary pl-4" aria-live="polite">
               <p className="font-display text-lg font-bold">{part.n}. {part.title}</p>
               <p className="text-sm text-muted-foreground">{part.text}</p>
             </div>
           )}
-        </div>
-        <div className="flex flex-col gap-3">
           <div role="group" aria-label="Station parts" className="grid gap-2">
             {STATION_PARTS.map((p) => {
               const Icon = ICONS[p.id];

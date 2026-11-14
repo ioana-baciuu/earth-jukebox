@@ -85,11 +85,6 @@ function TouchGlobe({ spin }: { spin: boolean }) {
         <cylinderGeometry args={[0.01, 0.01, 0.35, 12]} />
         <meshStandardMaterial color={C.steel} metalness={0.85} roughness={0.25} />
       </mesh>
-      {/* LED sun ring */}
-      <mesh rotation={[Math.PI / 2 - 0.25, 0, 0.2]}>
-        <torusGeometry args={[0.37, 0.006, 8, 120]} />
-        <meshStandardMaterial color={C.pink} emissive={C.pink} emissiveIntensity={1.6} toneMapped={false} />
-      </mesh>
       {/* cradle */}
       <mesh position={[0, -0.31, 0]}>
         <cylinderGeometry args={[0.11, 0.16, 0.08, 48]} />

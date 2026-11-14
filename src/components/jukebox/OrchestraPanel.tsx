@@ -12,9 +12,9 @@ export type Mix = Record<LayerId, { on: boolean; vol: number }>;
 
 export const PRESETS: { name: string; layers: LayerId[] }[] = [
   { name: "Whole planet", layers: [...LAYER_IDS] },
-  { name: "Stormy jungle", layers: ["rain", "storm", "forest"] },
-  { name: "Ocean voyage", layers: ["ocean", "rain", "dust"] },
-  { name: "Night city", layers: ["lights", "co2"] },
+  { name: "Stormy jungle", layers: ["storm", "forest"] },
+  { name: "Ocean voyage", layers: ["ocean"] },
+  { name: "Night city", layers: ["lights"] },
 ];
 
 export const SPEEDS = [

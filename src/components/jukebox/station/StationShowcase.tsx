@@ -6,7 +6,7 @@ import { useA11y } from "@/lib/a11y";
 import { STATION_PARTS, type StationPartId } from "@/lib/station-parts";
 
 const Station3D = lazy(() => import("./Station3D"));
-const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard, headphones: Headphones, pad: Vibrate, tablet: Monitor };
+const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard, headphones: Headphones, feedback: Vibrate, tablet: Monitor };
 
 const SPECS = [
   ["Footprint", "118 × 70 cm, fits a 150 cm wheelchair turning circle beside it"],
@@ -40,7 +40,7 @@ export function StationShowcase() {
           className="station-stage"
           data-scene-ready={ready ? "true" : undefined}
           role="img"
-          aria-label="3D model of the Earth Jukebox Station: a wooden pedestal with a raised touch globe on top, a sloped panel with four Braille buttons and an east–west joystick, headphones on a side hook, a warm-to-cool palm pad at the front and a tablet on an arm to the right."
+          aria-label="3D model of the Earth Jukebox Station: a wooden pedestal with a raised touch globe and rear support, a sloped panel with four Braille buttons and an east–west joystick, headphones on a side hook, thermal and vibration feedback integrated into the globe’s surface, and a tablet on an arm to the right."
         >
           <ClientOnly fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
             <Suspense fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>

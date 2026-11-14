@@ -91,7 +91,7 @@ export function MuseumSimulator() {
     </div>
     <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_auto]">
       <div><p className="text-xs font-bold uppercase text-layer">Headphone channel · {listening?"Listening":"Ready"}</p><h2 className="mt-1 font-display text-3xl">{state.name}</h2><p className="text-muted-foreground">{formatCoords(position.lat,position.lng)}</p>
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm"><span className="flex items-center gap-1"><Thermometer className="h-4 w-4"/>Thermal simulation: {state.thermal}</span><span className="flex items-center gap-1">{daylight?<Sun className="h-4 w-4"/>:<Moon className="h-4 w-4"/>}{clock?daylight?"Day side now":"Night side now":"Calculating daylight"}</span><span>{state.word}</span></div>
+        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm"><span className="flex items-center gap-1"><Thermometer className="h-4 w-4"/>Globe touch sensation (simulation): {state.thermal}</span><span className="flex items-center gap-1">{daylight?<Sun className="h-4 w-4"/>:<Moon className="h-4 w-4"/>}{clock?daylight?"Day side now":"Night side now":"Calculating daylight"}</span><span>{state.word}</span></div>
       </div>
       <div className="flex flex-wrap items-center gap-2 lg:max-w-sm">
         <Button size="xl" variant="layer" onClick={()=>void play()}><Volume2/>Where am I?</Button>
@@ -100,6 +100,6 @@ export function MuseumSimulator() {
         <Button variant="soft" aria-pressed={orchestra} onClick={()=>{setOrchestra(v=>!v);}}><Music4/>{orchestra?"Four instruments on":"Orchestra"}</Button>
       </div>
     </div>
-    <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">Software demonstrator · Touch sensors, raised relief, physical LEDs and thermal pads are proposed hardware, not connected devices. Thermal sensations require child-safe engineering and testing. Daylight is calculated from the current clock; NASA frames are historical.</p>
+    <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">Software demonstrator · Touch sensors, raised relief, physical LEDs and heating, cooling and vibration beneath the globe’s surface are proposed hardware, not connected devices. Sensations would be felt at the globe touch point, not on a separate pad, and require child-safe engineering and testing. Daylight is calculated from the current clock; NASA frames are historical.</p>
   </section>;
 }

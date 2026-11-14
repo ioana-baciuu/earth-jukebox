@@ -37,4 +37,5 @@ use the editor.
 - The globe (`globe.gl`) is imported dynamically inside useEffect because WebGL cannot run during SSR.
 - WebGL ring colours in `EarthGlobe.tsx` mirror the `--layer-*` tokens in `src/styles.css`; update both together.
 - Keep the museum station scene lazily client-loaded, with its five parts defined by the shared station-parts list, so drawings and descriptions stay aligned.
+- Model the fourth station part as a globe-surface feedback overlay sharing the globe camera target, not as a separate mesh on the pedestal, so the prototype illustrates integrated touch hardware.
 - Project 3D station hotspots into buttons owned by the page's React root; avoid separate Html roots that race during React 19 cleanup.

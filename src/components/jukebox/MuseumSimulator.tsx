@@ -45,7 +45,7 @@ export function MuseumSimulator() {
     const next=museumSnapshot(layer,lat,lng,v);
     const crossing=coastCrossing(stateRef.current.sample.land,next.sample.land);
     if(crossing){peekEngine()?.coast(crossing==="to-land",next.pan);buzz(crossing==="to-land"?[40,30,80]:[100]);}
-    setPosition({lat,lng});setValue(v);void play(next,narrate);
+    setPosition({lat,lng});setValue(v);if(narrate)globe.current?.flyTo(lat,lng,2.1,450);void play(next,narrate);
   },[layer,play,buzz]);
   const move=useCallback((direction:number)=>{
     const next=joystickMove(stateRef.current,direction);

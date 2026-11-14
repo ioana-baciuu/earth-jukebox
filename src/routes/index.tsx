@@ -304,6 +304,7 @@ function Index() {
           <p className="mt-4 max-w-xl text-xl text-muted-foreground">
             Touch Earth and hear ocean waves, thunder, forest birds and night-light bells.
           </p>
+          <Button asChild size="xl" variant="hero" className="mt-5"><Link to="/museum">Open museum prototype <ArrowRight aria-hidden="true" /></Link></Button>
 
           <div role="tablist" aria-label="Mode" className="mt-8 inline-flex rounded-full border-2 border-border bg-card p-1.5">
             {(

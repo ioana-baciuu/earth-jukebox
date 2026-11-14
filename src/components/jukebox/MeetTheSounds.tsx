@@ -16,10 +16,10 @@ export const CORE_SOUNDS: {
   high: { label: string; say: string };
 }[] = [
   {
-    id: "rain",
-    dataset: "NASA GPM rain & atmospheric rivers",
-    low: { label: "Light drizzle", say: "A little rain. Just a few drops, like a desert edge." },
-    high: { label: "Rainforest downpour", say: "A lot of rain. Pouring drops, like the Amazon rainforest." },
+    id: "forest",
+    dataset: "NASA GEDI forest height · illustrative sound mapping",
+    low: { label: "Low tree cover", say: "Few trees. A little rustle and occasional birdsong." },
+    high: { label: "Tall forest", say: "Tall forest. More birds sing. These birds are our sound metaphor, not satellite recordings." },
   },
   {
     id: "storm",
@@ -59,7 +59,8 @@ export function MeetTheSounds() {
     e.setSample(sampleFor(id, high ? 0.95 : 0.2));
     e.setMix({ [id]: 1 });
     setNow(key);
-    const c = CORE_SOUNDS.find((x) => x.id === id)!;
+    const c = CORE_SOUNDS.find((x) => x.id === id);
+    if (!c) return;
     const text = high ? c.high.say : c.low.say;
     speak(text);
     announce(text);

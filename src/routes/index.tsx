@@ -52,7 +52,7 @@ function Index() {
   const { settings, announce, speak, buzz } = useA11y();
   const globe = useRef<GlobeHandle>(null);
   const [mode, setMode] = useState<Mode>("explore");
-  const [layer, setLayer] = useState<LayerId>("rain");
+  const [layer, setLayer] = useState<LayerId>("ocean");
   const [cursor, setCursor] = useState<{ lat: number; lng: number } | null>(null);
   const [spot, setSpot] = useState<Spot | null>(null);
   const [open, setOpen] = useState(false);
@@ -95,7 +95,7 @@ function Index() {
     listen(p.lat, p.lng, p.name);
   };
 
-  const surprise = () => visit(FEATURED_PLACES[Math.floor(Math.random() * FEATURED_PLACES.length)] ?? FEATURED_PLACES[0]!);
+  const surprise = () => { const p = FEATURED_PLACES[Math.floor(Math.random() * FEATURED_PLACES.length)]; if (p) visit(p); };
 
   const chooseLayer = (id: LayerId) => {
     setLayer(id);
@@ -164,7 +164,8 @@ function Index() {
       const idx = Number(e.key) - 1;
       if (idx >= 0 && idx < LAYER_IDS.length) {
         setMode("explore");
-        chooseLayer(LAYER_IDS[idx]!);
+        const id = LAYER_IDS[idx];
+        if (id) chooseLayer(id);
       } else if (e.key.toLowerCase() === "s") {
         stopAll();
         announce("Sound stopped.");
@@ -191,10 +192,11 @@ function Index() {
   const pos = useRef({ lat: 2, lng: -30 });
   useEffect(() => {
     if (!playing) return;
-    const r = ROUTES.find((x) => x.id === route)!;
+    const r = ROUTES.find((x) => x.id === route);
+    if (!r) return;
     pos.current.lat = "lat" in r ? r.lat : (cursor?.lat ?? 2);
     if (route === "spot" && cursor) pos.current.lng = cursor.lng;
-    const deg = SPEEDS.find((s) => s.id === speed)!.degPerSec;
+    const deg = SPEEDS.find((s) => s.id === speed)?.degPerSec ?? 8;
     const dt = 0.15;
     let n = 0;
     let lastName = "";
@@ -221,7 +223,8 @@ function Index() {
       return;
     }
     const e = await getEngine();
-    const r = ROUTES.find((x) => x.id === route)!;
+    const r = ROUTES.find((x) => x.id === route);
+    if (!r) return;
     const lat = "lat" in r ? r.lat : (cursor?.lat ?? 2);
     const s = makeSpot(lat, pos.current.lng);
     e.setSample(s.sample);
@@ -299,7 +302,7 @@ function Index() {
             Listen to <span className="text-gradient-sun">the planet.</span>
           </h1>
           <p className="mt-4 max-w-xl text-xl text-muted-foreground">
-            Spin a real Earth, tap anywhere, and hear rain fall, thunder roll, oceans breathe and cities twinkle.
+            Touch Earth and hear ocean waves, thunder, forest birds and night-light bells.
           </p>
 
           <div role="tablist" aria-label="Mode" className="mt-8 inline-flex rounded-full border-2 border-border bg-card p-1.5">

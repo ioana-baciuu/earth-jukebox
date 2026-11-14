@@ -30,6 +30,8 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Project rules
+- NASA animations are offline-extracted into 48-frame image atlases with source manifests; only flat global sequences support geographic frame probing, because rotating camera films cannot be sampled by latitude/longitude.
+- The museum simulator and tablet share one geographic selection; joystick movement preserves latitude, and thermal feedback is a qualitative simulation rather than hardware or a safety specification.
 - Sound is synthesized live with Web Audio in `src/lib/audio/engine.ts` (one voice per Earth layer); keep pure value→sound rules in `src/lib/sonify-map.ts` so they stay unit-tested.
 - Earth data comes from offline-extracted 2.5° grids in `src/data/earth-grids.ts` (generated from NASA SVS frames); regenerate rather than hand-edit.
 - The globe (`globe.gl`) is imported dynamically inside useEffect because WebGL cannot run during SSR.

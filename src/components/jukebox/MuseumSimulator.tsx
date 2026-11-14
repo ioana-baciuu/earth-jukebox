@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Headphones, RotateCcw, Square, Sun, Moon, Thermometer, Volume2, Music4, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import skinDay from "@/assets/earth/skin-day.jpg.asset.json";
+import skinLights from "@/assets/earth/skin-lights.jpg.asset.json";
 import { EarthGlobe, type GlobeHandle } from "./EarthGlobe";
 import { NasaTablet } from "./NasaTablet";
 import { LayerIcon } from "./layer-icon";
@@ -67,7 +68,7 @@ export function MuseumSimulator() {
         <div className="flex items-center justify-between gap-2 px-5 pt-4 text-sm"><span className="flex items-center gap-2 font-bold"><Headphones className="h-4 w-4"/>Touch globe</span><span className="text-muted-foreground">North stays upright</span></div>
         <div className="museum-globe-stage">
           <EarthGlobe ref={globe} skinUrl={skinDay.url} layer={layer} cursor={position} autoRotate={false} calmMotion={settings.calmMotion}
-            lockedAxis sunPosition={sun} label="Museum Earth globe. Left and right rotate longitude. Enter speaks the selected place."
+            lockedAxis sunPosition={sun} nightSkinUrl={skinLights.url} label="Museum Earth globe. Left and right rotate longitude. Enter speaks the selected place."
             onPick={(lat,lng)=>probe(lat,lng)} onKeyDown={e=>{if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();move(e.key==="ArrowLeft"?-1:1);}else if(e.key==="Enter"||e.key===" "){e.preventDefault();void play();}}}/>
         </div>
         <div className="museum-plinth" aria-hidden="true"><span>EARTH JUKEBOX</span><span className="text-xs">CYSA SPHERE</span></div>

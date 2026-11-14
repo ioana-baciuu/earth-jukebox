@@ -1,19 +1,74 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type KeyboardEvent } from "react";
 import type { GlobeInstance } from "globe.gl";
+import { Moon, Sun, Sunrise } from "lucide-react";
 import bumpAsset from "@/assets/earth/earth-bump.jpg.asset.json";
 import skyAsset from "@/assets/earth/night-sky.jpg.asset.json";
 import type { LayerId } from "@/lib/layers";
 
 /** WebGL needs plain colours; these mirror the --layer-* tokens in styles.css. */
 const RING_RGB: Record<LayerId | "base", string> = {
-  base: "255,221,87",
-  rain: "125,196,255",
-  storm: "196,170,255",
-  ocean: "90,220,215",
-  lights: "255,196,92",
-  forest: "120,226,140",
-  dust: "255,160,200",
-  co2: "255,150,110",
+  base: "253,176,212",
+  rain: "103,202,255",
+  storm: "195,181,255",
+  ocean: "71,214,207",
+  lights: "249,168,112",
+  forest: "117,224,124",
+  dust: "210,184,165",
+  co2: "246,132,134",
+};
+
+/** Day/night blend: sunlit day skin, night side shows boosted NASA Black Marble city lights. */
+const DAY_NIGHT_VERTEX = `
+  varying vec3 vNormalW;
+  varying vec2 vUv;
+  void main() {
+    vNormalW = normalize(mat3(modelMatrix) * normal);
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+const DAY_NIGHT_FRAGMENT = `
+  uniform sampler2D dayTexture;
+  uniform sampler2D nightTexture;
+  uniform vec3 sunDirection;
+  uniform float glowBoost;
+  varying vec3 vNormalW;
+  varying vec2 vUv;
+  void main() {
+    float light = dot(normalize(vNormalW), normalize(sunDirection));
+    vec3 day = texture2D(dayTexture, vUv).rgb;
+    vec3 night = texture2D(nightTexture, vUv).rgb;
+    float lum = dot(night, vec3(0.299, 0.587, 0.114));
+    vec3 cityGlow = night * glowBoost + vec3(1.0, 0.78, 0.5) * smoothstep(0.18, 0.75, lum) * 0.55;
+    vec3 nightSide = day * 0.05 + cityGlow;
+    vec3 daySide = day * (0.62 + 0.38 * clamp(light * 1.6, 0.0, 1.0));
+    float blend = smoothstep(-0.07, 0.11, light);
+    vec3 color = mix(nightSide, daySide, blend);
+    float dusk = 1.0 - smoothstep(0.0, 0.16, abs(light));
+    color += vec3(0.95, 0.5, 0.62) * dusk * 0.14;
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
+/** Unit vector toward a lat/lng in globe.gl's world space (matches three-globe polar2Cartesian). */
+function geoVector(lat: number, lng: number): [number, number, number] {
+  const phi = ((90 - lat) * Math.PI) / 180;
+  const theta = ((90 - lng) * Math.PI) / 180;
+  return [Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta)];
+}
+
+/** Sun elevation (cosine) at a place: >0 day, <0 night. */
+function sunCosine(lat: number, lng: number, sun: { lat: number; lng: number }) {
+  const a = geoVector(lat, lng), b = geoVector(sun.lat, sun.lng);
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+type Phase = "day" | "twilight" | "night";
+function phaseOf(c: number): Phase { return c > 0.1 ? "day" : c < -0.1 ? "night" : "twilight"; }
+const PHASE_LABEL: Record<Phase, string> = {
+  day: "Day Side — Sunlight",
+  twilight: "Twilight — Sunrise / Sunset Line",
+  night: "Night Side — City Lights Active",
 };
 
 export interface GlobeHandle {
@@ -34,10 +89,12 @@ interface Props {
   onReady?: () => void;
   lockedAxis?: boolean;
   sunPosition?: { lat: number; lng: number } | undefined;
+  /** When set with sunPosition, the globe blends day skin with these night city lights. */
+  nightSkinUrl?: string;
 }
 
 export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
-  { skinUrl, layer, cursor, autoRotate, calmMotion, label, onPick, onKeyDown, onReady, lockedAxis = false, sunPosition },
+  { skinUrl, layer, cursor, autoRotate, calmMotion, label, onPick, onKeyDown, onReady, lockedAxis = false, sunPosition, nightSkinUrl },
   ref,
 ) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -48,6 +105,11 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
   pickRef.current = onPick;
   const readyRef = useRef(onReady);
   readyRef.current = onReady;
+  const uniformsRef = useRef<{ sunDirection: { value: { set: (x: number, y: number, z: number) => void } } } | null>(null);
+  const sunRef = useRef(sunPosition);
+  sunRef.current = sunPosition;
+  const [view, setView] = useState<{ lat: number; lng: number }>({ lat: 12, lng: 10 });
+  const dayNight = Boolean(nightSkinUrl && sunPosition);
 
   useImperativeHandle(ref, () => ({
     flyTo: (lat, lng, altitude = 1.9, ms = 1400) => {
@@ -76,8 +138,6 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
       const g = new Globe(el, { animateIn: true, rendererConfig: { antialias: true, alpha: true } })
         .backgroundColor("rgba(0,0,0,0)")
         .backgroundImageUrl(skyAsset.url)
-        .bumpImageUrl(bumpAsset.url)
-        .globeImageUrl(skinUrl)
         .showAtmosphere(true)
         .atmosphereColor("#9fd3ff")
         .atmosphereAltitude(0.2)
@@ -94,6 +154,38 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
           return pin;
         })
         .htmlAltitude(0.01);
+      if (nightSkinUrl) {
+        const THREE = await import("three");
+        if (disposed) return;
+        const loader = new THREE.TextureLoader();
+        const [dayTexture, nightTexture] = await Promise.all([
+          loader.loadAsync(skinUrl),
+          loader.loadAsync(nightSkinUrl),
+        ]);
+        if (disposed) return;
+        const sun = sunRef.current ?? { lat: 0, lng: 0 };
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            dayTexture: { value: dayTexture },
+            nightTexture: { value: nightTexture },
+            sunDirection: { value: new THREE.Vector3(...geoVector(sun.lat, sun.lng)) },
+            glowBoost: { value: 1.7 },
+          },
+          vertexShader: DAY_NIGHT_VERTEX,
+          fragmentShader: DAY_NIGHT_FRAGMENT,
+        });
+        uniformsRef.current = material.uniforms as never;
+        g.globeMaterial(material);
+      } else {
+        g.bumpImageUrl(bumpAsset.url).globeImageUrl(skinUrl);
+      }
+      let lastView = 0;
+      g.onZoom(({ lat, lng }) => {
+        const now = performance.now();
+        if (now - lastView < 90) return;
+        lastView = now;
+        setView({ lat, lng });
+      });
       g.pointOfView({ lat: 12, lng: 10, altitude: 2.3 });
       const controls = g.controls();
       controls.autoRotate = true;
@@ -128,8 +220,9 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
   }, []);
 
   useEffect(() => {
+    if (nightSkinUrl) return;
     globeRef.current?.globeImageUrl(skinUrl);
-  }, [skinUrl, ready]);
+  }, [skinUrl, ready, nightSkinUrl]);
 
   useEffect(() => {
     const g = globeRef.current;
@@ -144,25 +237,15 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
   }, [autoRotate, calmMotion, ready, lockedAxis]);
 
   useEffect(() => {
-    const g = globeRef.current;
-    if (!g || !sunPosition) return;
-    // Hemisphere cap centered opposite the Sun: real-time solar geometry, not NASA live imagery.
-    g.polygonCapColor("rgba(0,0,0,0.62)").polygonSideColor("rgba(0,0,0,0)")
-      .polygonStrokeColor("rgba(255,221,87,0.5)").polygonAltitude(0.004);
-    const phi = sunPosition.lat * Math.PI / 180, lambda = sunPosition.lng * Math.PI / 180;
-    const s = [Math.cos(phi)*Math.cos(lambda), Math.cos(phi)*Math.sin(lambda), Math.sin(phi)];
-    const u = [-Math.sin(lambda), Math.cos(lambda), 0];
-    const v = [-Math.sin(phi)*Math.cos(lambda), -Math.sin(phi)*Math.sin(lambda), Math.cos(phi)];
-    const coordinates: number[][] = [];
-    for (let i=0;i<=120;i++) {
-      const t=i/120*2*Math.PI;
-      const x=(u[0]??0)*Math.cos(t)+(v[0]??0)*Math.sin(t)-0.002*(s[0]??0);
-      const y=(u[1]??0)*Math.cos(t)+(v[1]??0)*Math.sin(t)-0.002*(s[1]??0);
-      const z=(u[2]??0)*Math.cos(t)+(v[2]??0)*Math.sin(t)-0.002*(s[2]??0);
-      coordinates.push([Math.atan2(y,x)*180/Math.PI,Math.atan2(z,Math.hypot(x,y))*180/Math.PI]);
-    }
-    g.polygonsData([{ type:"Feature", geometry:{type:"Polygon",coordinates:[coordinates]},properties:{} }]);
+    if (!sunPosition) return;
+    uniformsRef.current?.sunDirection.value.set(...geoVector(sunPosition.lat, sunPosition.lng));
   }, [ready, sunPosition]);
+
+  const viewCos = sunPosition ? sunCosine(view.lat, view.lng, sunPosition) : 1;
+  const phase = phaseOf(viewCos);
+  const nightShare = Math.round(((1 - viewCos) / 2) * 100);
+  const sunHours = sunPosition ? (((12 + (view.lng - sunPosition.lng) / 15) % 24) + 24) % 24 : 12;
+  const sunTime = `${String(Math.floor(sunHours)).padStart(2, "0")}:${String(Math.floor((sunHours % 1) * 60)).padStart(2, "0")}`;
 
   useEffect(() => {
     const g = globeRef.current;
@@ -185,6 +268,22 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
       className="relative h-full w-full cursor-crosshair rounded-3xl"
     >
       <div ref={mountRef} className="absolute inset-0" />
+      {dayNight && ready && (
+        <>
+          <div className="daynight-badge" data-phase={phase} aria-hidden="true">
+            <span className="flex items-center gap-2 text-sm font-bold">
+              {phase === "night" ? <Moon className="h-4 w-4 text-primary" /> : phase === "day" ? <Sun className="h-4 w-4 text-accent" /> : <Sunrise className="h-4 w-4 text-primary" />}
+              {PHASE_LABEL[phase]}
+            </span>
+            <span className="daynight-meter"><span style={{ width: `${nightShare}%` }} /></span>
+            <span className="flex justify-between gap-3 text-xs text-muted-foreground">
+              <span>{nightShare}% of this view in night</span>
+              <span>Sun time {sunTime}</span>
+            </span>
+          </div>
+          <p className="sr-only" aria-live="polite">{PHASE_LABEL[phase]}</p>
+        </>
+      )}
     </div>
   );
 });

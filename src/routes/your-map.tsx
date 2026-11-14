@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ImageUp, Pause, Play } from "lucide-react";
 import nasaSst from "@/assets/earth/nasa-sst.jpg.asset.json";
-import skinDust from "@/assets/earth/skin-dust.jpg.asset.json";
+import skinForest from "@/assets/earth/skin-forest.jpg.asset.json";
 import skinLights from "@/assets/earth/skin-lights.jpg.asset.json";
-import skinCo2 from "@/assets/earth/skin-co2.jpg.asset.json";
+import skinStorm from "@/assets/earth/skin-storm.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { getEngine, peekEngine } from "@/lib/audio/engine";
@@ -40,9 +40,9 @@ interface Analysis {
 
 const SAMPLES = [
   { name: "Ocean temperature", url: nasaSst.url },
-  { name: "Dust and smoke", url: skinDust.url },
+  { name: "Forest height proxy", url: skinForest.url },
   { name: "City lights at night", url: skinLights.url },
-  { name: "Carbon dioxide", url: skinCo2.url },
+  { name: "Lightning", url: skinStorm.url },
 ];
 
 function analyse(img: HTMLImageElement): Analysis {

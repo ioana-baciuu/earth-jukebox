@@ -28,7 +28,7 @@ const SOURCES: Record<string, string> = {
   storm: "Lightning flashes counted from the ISS Lightning Imaging Sensor frame (SVS 5011), smoothed over each area.",
   ocean: "Colour of the ECCO2 sea-surface temperature map (SVS 3912), read from blue (cold) to red (warm).",
   lights: "Brightness of NASA Black Marble night lights.",
-  forest: "Darkness and greenness of forests in NASA Blue Marble, matching GEDI forest-height patterns.",
+  forest: "Vegetation greenness in NASA Blue Marble is an illustrative proxy. It is NOT GEDI canopy height in metres. The companion film is the official GEDI visualization (SVS 4950).",
   dust: "Colour strength in the GEOS aerosol map (SVS 5572): pink dust, orange smoke, blue sea salt, green pollution.",
   co2: "Brightness of the DYAMOND carbon dioxide frame (SVS 5436).",
 };
@@ -50,7 +50,7 @@ function About() {
           {[
             ["Read the picture", "Each NASA frame is split into a grid of small squares, 2.5 degrees wide, covering the whole globe."],
             ["Measure it", "In every square we measure brightness, colour and how much of the picture is lit up."],
-            ["Play it", "That number drives a natural sound: one drop or pouring rain, a far rumble or a thunder crack."],
+            ["Play it", "Normalized colour values drive waves, thunder, birds and bells. These sounds are designed metaphors, not recorded satellite audio."],
           ].map(([t, d], i) => (
             <li key={t} className="surface p-6">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-primary font-bold text-primary-foreground">{i + 1}</span>
@@ -117,13 +117,27 @@ function About() {
         <div className="surface p-6">
           <h2 className="font-display text-3xl font-bold">Honest notes</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-lg">
-            <li>The grids are read from single NASA frames, so they show one moment, not a long-term average.</li>
-            <li>The rain layer is an estimate built from other NASA layers, not a direct rain measurement.</li>
-            <li>The sounds are made live in your browser, so it keeps working without extra downloads.</li>
+            <li>Globe values use historical 2.5° image-derived grids, not live measurements. They are normalized proxies, not temperatures in °C or heights in metres.</li>
+            <li>The tablet contains 48 frames extracted from each official NASA film. Flat-map probing follows frame colours; GEDI's rotating camera film is not a time series or a geographic touch map.</li>
+            <li>The Sun position is calculated from the current UTC clock. This does not make the night-light imagery live.</li>
+            <li>Birdsong represents tree cover; it does not measure birds or biodiversity. City bells represent observed light brightness, not population.</li>
+            <li>Physical sensors, LED illumination, raised symbols, Braille and thermal feedback are proposed exhibit hardware. They require accessibility evaluation and child-safe testing before deployment.</li>
           </ul>
         </div>
       </section>
 
+      <section className="mt-12 border-t border-border pt-8" aria-labelledby="references">
+        <h2 id="references" className="font-display text-3xl font-bold">Sources and authorship</h2>
+        <ul className="mt-4 space-y-3 text-base">
+          <li><a className="underline" href="https://svs.gsfc.nasa.gov/3912/">NASA SVS 3912: ECCO2 sea surface temperature and currents</a> — historical model visualization, 2005–2007.</li>
+          <li><a className="underline" href="https://svs.gsfc.nasa.gov/5011/">NASA SVS 5011: ISS Lightning Imaging Sensor</a> — lightning detected during 2017–2023. Detection coverage is not global uniform coverage.</li>
+          <li><a className="underline" href="https://svs.gsfc.nasa.gov/4950/">NASA SVS 4950: GEDI forest structure</a> — rotating height visualization, not seasonal greening or growth animation.</li>
+          <li><a className="underline" href="https://svs.gsfc.nasa.gov/5276/">NASA SVS 5276: Black Marble night lights</a> — annual composite images, 2012–2023. Repeated extracted frames can show the same annual image.</li>
+          <li><a className="underline" href="https://visibleearth.nasa.gov/collection/1484/blue-marble">NASA Blue Marble</a> — Earth textures and the existing vegetation proxy.</li>
+          <li>CYSA Sphere authors the teaching comparisons, friendly level words, image descriptions, sound choices and proposed museum design. They are interpretations of the linked NASA visualizations, not NASA quotations or validated scientific statements.</li>
+          <li>Erie, Umwelt and DIXTRAL inspired earlier research discussions; this prototype does not run those libraries or claim compliance with their evaluation protocols. User comprehension and accessibility have not yet been tested with blind children.</li>
+        </ul>
+      </section>
       <div className="mt-12 flex flex-wrap gap-3">
         <Button asChild size="xl" variant="hero">
           <Link to="/">Go explore the globe</Link>

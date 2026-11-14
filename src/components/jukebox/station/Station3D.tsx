@@ -64,7 +64,7 @@ function useWood() {
 
 /** 1 · Tactile touch globe with real NASA skin, relief bump and LED sun ring. */
 function TouchGlobe({ spin }: { spin: boolean }) {
-  const [map, bumpMap] = useTexture([skinDay.url, bump.url]);
+  const { map, bumpMap } = useTexture({ map: skinDay.url, bumpMap: bump.url });
   map.colorSpace = THREE.SRGBColorSpace;
   const earth = useRef<THREE.Mesh>(null);
   useFrame((_, dt) => {

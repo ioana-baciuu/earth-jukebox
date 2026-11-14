@@ -6,7 +6,7 @@ import { useA11y } from "@/lib/a11y";
 import { STATION_PARTS, type StationPartId } from "@/lib/station-parts";
 
 const Station3D = lazy(() => import("./Station3D"));
-const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard, headphones: Headphones, pad: Vibrate, tablet: Monitor };
+const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard, headphones: Headphones, feedback: Vibrate, tablet: Monitor };
 
 const SPECS = [
   ["Footprint", "118 × 70 cm, fits a 150 cm wheelchair turning circle beside it"],
@@ -40,7 +40,7 @@ export function StationShowcase() {
           className="station-stage"
           data-scene-ready={ready ? "true" : undefined}
           role="img"
-          aria-label="3D model of the Earth Jukebox Station: a wooden pedestal with a raised touch globe on top, a sloped panel with four Braille buttons and an east–west joystick, headphones on a side hook, a warm-to-cool palm pad at the front and a tablet on an arm to the right."
+          aria-label="3D model of the Earth Jukebox Station: a wooden pedestal with a raised touch globe and rear support, a sloped panel with four Braille buttons and an east–west joystick, headphones on a side hook, thermal and vibration feedback integrated into the globe’s surface, and a tablet on an arm to the right."
         >
           <ClientOnly fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
             <Suspense fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
@@ -62,14 +62,14 @@ export function StationShowcase() {
               >{p.n}</Button>
             ))}
           </div>
+        </div>
+        <div className="flex flex-col gap-3">
           {part && (
-            <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-lg border-2 border-primary bg-background/90 p-3 backdrop-blur" aria-hidden="true">
+            <div className="border-l-2 border-primary pl-4" aria-live="polite">
               <p className="font-display text-lg font-bold">{part.n}. {part.title}</p>
               <p className="text-sm text-muted-foreground">{part.text}</p>
             </div>
           )}
-        </div>
-        <div className="flex flex-col gap-3">
           <div role="group" aria-label="Station parts" className="grid gap-2">
             {STATION_PARTS.map((p) => {
               const Icon = ICONS[p.id];

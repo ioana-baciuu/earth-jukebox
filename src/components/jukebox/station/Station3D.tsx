@@ -25,7 +25,7 @@ const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [nu
   globe: { label: [0.28, 1.5, -0.12], cam: [0.8, 1.45, 1.25], target: [0, 1.15, -0.12] },
   panel: { label: [-0.2, 1.02, 0.25], cam: [0.2, 1.55, 1.15], target: [0, 0.9, 0.17] },
   headphones: { label: [-0.7, 0.8, 0.1], cam: [-1.5, 1.0, 0.9], target: [-0.62, 0.62, 0.1] },
-  pad: { label: [0.25, 0.88, 0.5], cam: [0.5, 1.25, 1.35], target: [0, 0.8, 0.42] },
+  feedback: { label: [-0.18, 1.2, 0.16], cam: [0.65, 1.4, 1.1], target: [0, 1.18, -0.12] },
   tablet: { label: [0.6, 1.33, -0.02], cam: [1.4, 1.35, 0.95], target: [0.56, 1.12, -0.04] },
 };
 
@@ -76,19 +76,14 @@ function TouchGlobe({ spin }: { spin: boolean }) {
         <sphereGeometry args={[0.3, 96, 64]} />
         <meshStandardMaterial map={map} bumpMap={bumpMap} bumpScale={6} roughness={0.75} metalness={0.02} />
       </mesh>
-      {/* north-up axis and half meridian */}
-      <mesh>
+      {/* Rear-mounted north-up support leaves the touch surface unobstructed. */}
+      <mesh position={[0, 0, -0.35]}>
         <cylinderGeometry args={[0.006, 0.006, 0.7, 12]} />
         <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
       </mesh>
-      <mesh rotation={[0, Math.PI / 2, Math.PI / 2]}>
-        <torusGeometry args={[0.33, 0.01, 12, 80, Math.PI]} />
+      <mesh position={[0, -0.34, -0.175]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.01, 0.01, 0.35, 12]} />
         <meshStandardMaterial color={C.steel} metalness={0.85} roughness={0.25} />
-      </mesh>
-      {/* LED sun ring */}
-      <mesh rotation={[Math.PI / 2 - 0.25, 0, 0.2]}>
-        <torusGeometry args={[0.37, 0.006, 8, 120]} />
-        <meshStandardMaterial color={C.pink} emissive={C.pink} emissiveIntensity={1.6} toneMapped={false} />
       </mesh>
       {/* cradle */}
       <mesh position={[0, -0.31, 0]}>
@@ -192,28 +187,14 @@ function Headphones() {
   );
 }
 
-/** 4 · Palm rest: cool-to-warm thermal surface with vibration ridges. */
-function ThermalPad() {
-  const tex = useCanvasTexture((ctx, w, h) => {
-    const g = ctx.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, C.ocean);
-    g.addColorStop(0.5, "#e9e4f2");
-    g.addColorStop(1, C.pink);
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-  }, 256, 32);
+/** 4 · Concept overlay for actuators beneath the globe's touch surface. */
+function GlobeFeedback({ visible }: { visible: boolean }) {
   return (
-    <group position={[0, 0.8, 0.43]}>
-      <RoundedBox args={[0.46, 0.04, 0.15]} radius={0.015} smoothness={3} castShadow>
-        <meshStandardMaterial color={C.navy} roughness={0.6} />
-      </RoundedBox>
-      <RoundedBox args={[0.38, 0.012, 0.1]} radius={0.005} position={[0, 0.024, 0]}>
-        <meshStandardMaterial map={tex} roughness={0.45} />
-      </RoundedBox>
-      {[-0.12, -0.06, 0, 0.06, 0.12].map((x) => (
-        <mesh key={x} position={[x, 0.033, 0]}>
-          <boxGeometry args={[0.008, 0.006, 0.085]} />
-          <meshStandardMaterial color={C.cream} roughness={0.5} />
+    <group position={[0, 1.18, -0.12]} visible={visible}>
+      {[C.ocean, C.pink, C.storm].map((color, index) => (
+        <mesh key={color} rotation={[0, -0.8 + index * 0.7, 0]}>
+          <sphereGeometry args={[0.303, 32, 20, 0.15, 0.55, 1.1, 0.65]} />
+          <meshBasicMaterial color={color} transparent opacity={0.45} depthWrite={false} side={THREE.DoubleSide} />
         </mesh>
       ))}
     </group>
@@ -379,7 +360,7 @@ export default function Station3D({
       <Pedestal />
       <group ref={reg("panel")}><ControlPanel /></group>
       <group ref={reg("headphones")}><Headphones /></group>
-      <group ref={reg("pad")}><ThermalPad /></group>
+      <group ref={reg("feedback")}><GlobeFeedback visible={selected === "feedback"} /></group>
       <group ref={reg("tablet")}>
         <Suspense fallback={null}>
           <Tablet />

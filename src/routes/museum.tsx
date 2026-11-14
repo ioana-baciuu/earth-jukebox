@@ -23,7 +23,7 @@ export const Route = createFileRoute("/museum")({
   component: MuseumPage,
 });
 
-const PART_ICONS = { globe: Hand, panel: Keyboard, headphones: Headphones, pad: Vibrate, tablet: Monitor } as const;
+const PART_ICONS = { globe: Hand, panel: Keyboard, headphones: Headphones, feedback: Vibrate, tablet: Monitor } as const;
 const PARTS = STATION_PARTS.map((p) => ({ ...p, icon: PART_ICONS[p.id] }));
 
 const FLOW = [
@@ -53,7 +53,7 @@ function KioskBlueprint() {
       <title id="kiosk-t">Earth Jukebox exhibit station drawing</title>
       <desc id="kiosk-d">
         A waist-high wooden pedestal holds a raised touch globe on top. In front of it is a sloped panel with four big
-        round buttons and a joystick. Headphones hang on the left, a vibrating hand rest sits in front, and a screen
+        round buttons and a joystick. Headphones hang on the left, touch sensations are built into the globe, and a screen
         stands behind for teachers.
       </desc>
       <g fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted-foreground" strokeLinejoin="round">
@@ -98,15 +98,14 @@ function KioskBlueprint() {
         <rect x="132" y="318" width="16" height="28" rx="6" fill="currentColor" />
         <path d="M140 330 Q150 300 170 280" strokeWidth="2" />
       </g>
-      {/* rumble pad */}
-      <rect x="260" y="315" width="120" height="22" rx="11" className="fill-secondary" stroke="currentColor" strokeWidth="2" />
+      {/* Touch feedback is integrated into the globe, not a separate hand rest. */}
       {/* labels */}
       <g className="fill-foreground font-display" fontSize="22" fontWeight="700">
         {[
           [1, 205, 70],
           [2, 320, 225],
           [3, 105, 300],
-          [4, 400, 335],
+           [4, 375, 150],
           [5, 600, 60],
         ].map(([n, x, y]) => (
           <g key={n}>

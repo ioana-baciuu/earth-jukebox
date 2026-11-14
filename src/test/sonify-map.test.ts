@@ -57,3 +57,22 @@ describe("NASA data grids", () => {
     expect(sampleEarth(23, 10).lights).toBeLessThan(0.1);
   });
 });
+
+import { coastCrossing, latitudeToFreq, longitudeToPan } from "@/lib/sonify-map";
+describe("sonic navigation", () => {
+  it("north pole is one octave above the equator, south pole one below", () => {
+    expect(latitudeToFreq(0)).toBeCloseTo(440);
+    expect(latitudeToFreq(90)).toBeCloseTo(880);
+    expect(latitudeToFreq(-90)).toBeCloseTo(220);
+  });
+  it("west pans left, east pans right", () => {
+    expect(longitudeToPan(-180)).toBe(-1);
+    expect(longitudeToPan(0)).toBe(0);
+    expect(longitudeToPan(180)).toBe(1);
+  });
+  it("detects stepping onto land and back into the sea", () => {
+    expect(coastCrossing(0, 1)).toBe("to-land");
+    expect(coastCrossing(1, 0)).toBe("to-water");
+    expect(coastCrossing(1, 0.9)).toBeNull();
+  });
+});

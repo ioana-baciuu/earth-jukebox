@@ -763,6 +763,31 @@ export class AudioEngine {
       o.stop(t + d + 0.05);
     });
   }
+
+  /** Short glide tone used as a coastline cue: rising wood-knock on land, falling splash into the sea. */
+  coast(toLand: boolean, pan = 0) {
+    const ctx = this.ctx;
+    const t = ctx.currentTime + 0.01;
+    const p = ctx.createStereoPanner();
+    p.pan.value = pan;
+    p.connect(this.bus);
+    if (toLand) {
+      this.marimba(196, 0.35, pan, t);
+      this.marimba(294, 0.3, pan, t + 0.09);
+      return;
+    }
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(900, t);
+    o.frequency.exponentialRampToValueAtTime(260, t + 0.35);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.18, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0005, t + 0.45);
+    o.connect(g).connect(p);
+    o.start(t);
+    o.stop(t + 0.5);
+  }
 }
 
 let engine: AudioEngine | null = null;

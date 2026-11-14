@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, type KeyboardEvent } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type KeyboardEvent } from "react";
 import type { GlobeInstance } from "globe.gl";
 import bumpAsset from "@/assets/earth/earth-bump.jpg.asset.json";
 import skyAsset from "@/assets/earth/night-sky.jpg.asset.json";
@@ -41,6 +41,7 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
   const wrapRef = useRef<HTMLDivElement>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<GlobeInstance | null>(null);
+  const [ready, setReady] = useState(false);
   const pickRef = useRef(onPick);
   pickRef.current = onPick;
   const readyRef = useRef(onReady);
@@ -106,6 +107,7 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
       ro = new ResizeObserver(size);
       ro.observe(el);
       globeRef.current = g;
+      setReady(true);
       readyRef.current?.();
     })();
     return () => {
@@ -125,13 +127,13 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
 
   useEffect(() => {
     globeRef.current?.globeImageUrl(skinUrl);
-  }, [skinUrl]);
+  }, [skinUrl, ready]);
 
   useEffect(() => {
     const g = globeRef.current;
     if (!g) return;
     g.controls().autoRotate = autoRotate && !calmMotion;
-  }, [autoRotate, calmMotion]);
+  }, [autoRotate, calmMotion, ready]);
 
   useEffect(() => {
     const g = globeRef.current;
@@ -141,7 +143,7 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
     const data = cursor ? [{ lat: cursor.lat, lng: cursor.lng }] : [];
     g.ringsData(calmMotion ? [] : data);
     g.htmlElementsData(data);
-  }, [cursor, layer, calmMotion]);
+  }, [cursor, layer, calmMotion, ready]);
 
   return (
     <div
@@ -151,7 +153,7 @@ export const EarthGlobe = forwardRef<GlobeHandle, Props>(function EarthGlobe(
       aria-roledescription="interactive globe"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="relative h-full w-full cursor-crosshair rounded-full"
+      className="relative h-full w-full cursor-crosshair rounded-3xl"
     >
       <div ref={mountRef} className="absolute inset-0" />
     </div>

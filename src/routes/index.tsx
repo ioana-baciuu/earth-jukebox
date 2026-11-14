@@ -12,8 +12,10 @@ import { getEngine, peekEngine } from "@/lib/audio/engine";
 import { useA11y } from "@/lib/a11y";
 import { clampLat, layerStrength, sampleEarth, wrapLng } from "@/lib/earth-data";
 import { LAYER_IDS, LAYERS, type LayerId } from "@/lib/layers";
-import { describePlace, FEATURED_PLACES, type Place } from "@/lib/places";
-import { pentatonicFreq } from "@/lib/sonify-map";
+import { describePlace, FEATURED_PLACES, formatCoords, type Place } from "@/lib/places";
+import { coastCrossing, latitudeToFreq, longitudeToPan, pentatonicFreq } from "@/lib/sonify-map";
+import { MeetTheSounds } from "@/components/jukebox/MeetTheSounds";
+import { ContrastStories } from "@/components/jukebox/ContrastStories";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -47,7 +49,7 @@ function makeSpot(lat: number, lng: number, name?: string): Spot {
 const DEFAULT_MIX = Object.fromEntries(LAYER_IDS.map((id) => [id, { on: true, vol: 0.7 }])) as Mix;
 
 function Index() {
-  const { settings, announce, speak } = useA11y();
+  const { settings, announce, speak, buzz } = useA11y();
   const globe = useRef<GlobeHandle>(null);
   const [mode, setMode] = useState<Mode>("explore");
   const [layer, setLayer] = useState<LayerId>("rain");
@@ -113,10 +115,17 @@ function Index() {
     const step = e.shiftKey ? 1 : 5;
     const base = cursor ?? { lat: 10, lng: 10 };
     let { lat, lng } = base;
-    if (e.key === "ArrowUp") lat += step;
-    else if (e.key === "ArrowDown") lat -= step;
-    else if (e.key === "ArrowLeft") lng -= step * 2;
-    else if (e.key === "ArrowRight") lng += step * 2;
+    if (e.key === "ArrowUp" || e.code === "Numpad8") lat += step;
+    else if (e.key === "ArrowDown" || e.code === "Numpad2") lat -= step;
+    else if (e.key === "ArrowLeft" || e.code === "Numpad4") lng -= step * 2;
+    else if (e.key === "ArrowRight" || e.code === "Numpad6") lng += step * 2;
+    else if (e.key.toLowerCase() === "c") {
+      e.preventDefault();
+      const eng = await getEngine();
+      eng.marimba(latitudeToFreq(base.lat), 0.35, longitudeToPan(base.lng));
+      speak(`${describePlace(base.lat, base.lng, sampleEarth(base.lat, base.lng).land > 0.5)}. ${formatCoords(base.lat, base.lng)}.`, { force: true });
+      return;
+    }
     else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       if (mode === "explore") listen(base.lat, base.lng);
@@ -131,10 +140,19 @@ function Index() {
     const s = sampleEarth(lat, lng);
     const v = layerStrength(layer, s);
     const eng = await getEngine();
-    eng.marimba(pentatonicFreq(60, Math.round(v * 12)), 0.3, Math.max(-1, Math.min(1, lng / 180)));
+    const pan = longitudeToPan(lng);
+    // latitude beacon: higher pitch towards the North Pole, lower towards the South
+    eng.marimba(latitudeToFreq(lat), 0.18, pan);
+    // layer ping: higher note = more of this layer here
+    eng.marimba(pentatonicFreq(60, Math.round(v * 12)), 0.25, pan, 0);
+    const crossing = coastCrossing(sampleEarth(base.lat, base.lng).land, s.land);
+    if (crossing) {
+      eng.coast(crossing === "to-land", pan);
+      buzz(crossing === "to-land" ? [40, 30, 80] : [120]);
+    }
     if (announceTimer.current) clearTimeout(announceTimer.current);
     announceTimer.current = setTimeout(() => {
-      announce(`${describePlace(lat, lng, s.land > 0.5)}. ${LAYERS[layer].name}: ${levelWord(layer, s)}.`);
+      announce(`${crossing === "to-land" ? "Land ahead! " : crossing === "to-water" ? "Splash, into the sea. " : ""}${describePlace(lat, lng, s.land > 0.5)}. ${LAYERS[layer].name}: ${levelWord(layer, s)}.`);
     }, 450);
   };
 
@@ -257,7 +275,7 @@ function Index() {
                 <p className="text-sm text-muted-foreground">
                   {mode === "explore" && cursorSpot
                     ? `${LAYERS[layer].name}: ${levelWord(layer, cursorSpot.sample)}`
-                    : "Keyboard: focus the globe, use the arrows, press Enter"}
+                    : "Keys: arrows or number pad move, Enter listens, C tells you where you are"}
                 </p>
               </div>
               {mode === "explore" && cursor && (
@@ -381,6 +399,9 @@ function Index() {
           )}
         </div>
       </section>
+
+      <MeetTheSounds />
+      <ContrastStories onVisit={(p, l) => { setLayer(l); visit(p); }} />
 
       {/* Places */}
       <section aria-labelledby="places-title" className="mx-auto max-w-7xl px-4 py-12 sm:px-6">

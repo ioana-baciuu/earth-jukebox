@@ -7,3 +7,8 @@
 - [x] Verify in browser (globe click → pop-up + sound, orchestra spin)
 - [x] NASA Worldview: "see today's satellite picture" link per place
 - [x] land_surface_NASA_Worldview.html reviewed (same Worldview page shell, no data inside)
+- [x] Museum exhibit prototype page (station drawing, control panel, visit flow)
+- [x] Meet the sounds (4 core NASA datasets, a little / a lot)
+- [x] Compare two places lessons
+- [x] Coastline sounds + north/south pitch + west/east stereo, C key, number pad
+- [x] "Hear what NASA sees" spoken picture descriptions

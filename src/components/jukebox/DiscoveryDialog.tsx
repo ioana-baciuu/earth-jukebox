@@ -36,6 +36,17 @@ export function worldviewUrl(lat: number, lng: number, layer: LayerId) {
   return `https://worldview.earthdata.nasa.gov/?v=${box}&l=${layers}`;
 }
 
+/** What NASA's satellite picture looks like, described for children who cannot see it. */
+export const NASA_SEES: Record<LayerId, string> = {
+  rain: "From space, NASA's rain satellites see wet places as bright bands of colour wrapped around the middle of the Earth, like a belt of rain. Deserts look empty and dark.",
+  storm: "The Space Station counted lightning flashes for six years. On the map, the flashes look like sparkly dust, thickest over Africa, South America and Southeast Asia, and almost missing over the oceans.",
+  ocean: "NASA's ocean map is painted with colour: warm water near the equator glows red and orange, cold water near the poles is deep blue, and swirls show currents carrying heat like rivers in the sea.",
+  lights: "At night, from 500 miles up, NASA's Black Marble satellite sees cities as golden spider webs of light. Oceans, deserts and forests stay pitch black.",
+  forest: "NASA's laser measured how tall trees are. Tall rainforests look dark green and thick, while grasslands and deserts look pale and bare.",
+  dust: "NASA's air model shows dust as orange clouds blowing off the Sahara, smoke as grey plumes from fires, and sea salt as blue haze over stormy oceans.",
+  co2: "NASA's carbon dioxide map shows the gas as glowing ribbons drifting around the planet, brightest where cities and power plants are, swirling with the wind.",
+};
+
 export function levelWord(layer: LayerId, s: EarthSample) {
   if (layer === "ocean" && s.land > 0.6) return "no sea here — try the blue ocean";
   return LAYERS[layer].levels[levelIndex(layerStrength(layer, s))];
@@ -220,6 +231,9 @@ export function DiscoveryDialog({
             </Button>
             <Button size="xl" variant="soft" onClick={() => spot && speak(`${spot.name}. ${info.name}: ${word}. ${info.sound}`, { force: true })}>
               <Volume2 aria-hidden="true" /> Read aloud
+            </Button>
+            <Button size="xl" variant="soft" onClick={() => speak(NASA_SEES[layer], { force: true })}>
+              <Volume2 aria-hidden="true" /> Hear what NASA sees
             </Button>
             <Button size="xl" variant="soft" onClick={() => onOpenChange(false)}>
               <Square aria-hidden="true" /> Stop and close

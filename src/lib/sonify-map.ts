@@ -80,3 +80,22 @@ export function pentatonicFreq(rootMidi: number, step: number, minor = false) {
   const deg = ((step % scale.length) + scale.length) % scale.length;
   return midiToFreq(rootMidi + oct * 12 + (scale[deg] ?? 0));
 }
+
+/** Latitude → beacon pitch: one octave up at the North Pole, one down at the South Pole (440 Hz at the equator). */
+export function latitudeToFreq(lat: number): number {
+  const l = Math.max(-90, Math.min(90, lat));
+  return 440 * Math.pow(2, l / 90);
+}
+
+/** Longitude → stereo pan: west in the left ear, east in the right ear. */
+export function longitudeToPan(lng: number): number {
+  return Math.max(-1, Math.min(1, lng / 180));
+}
+
+/** Detect walking from sea onto land (or back). */
+export function coastCrossing(prevLand: number, nextLand: number): "to-land" | "to-water" | null {
+  const a = prevLand > 0.5;
+  const b = nextLand > 0.5;
+  if (a === b) return null;
+  return b ? "to-land" : "to-water";
+}

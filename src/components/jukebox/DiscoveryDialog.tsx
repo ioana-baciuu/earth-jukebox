@@ -19,6 +19,23 @@ export interface Spot {
   sample: EarthSample;
 }
 
+/** Overlay layers in NASA Worldview that match each Earth Jukebox layer. */
+const WORLDVIEW_LAYERS: Partial<Record<LayerId, string>> = {
+  rain: "IMERG_Precipitation_Rate",
+  ocean: "GHRSST_L4_MUR_Sea_Surface_Temperature",
+  lights: "VIIRS_Black_Marble",
+};
+
+/** Deep link to today's satellite view of this spot in NASA Worldview. */
+export function worldviewUrl(lat: number, lng: number, layer: LayerId) {
+  const d = 8;
+  const box = [lng - d * 1.6, lat - d, lng + d * 1.6, lat + d].map((n) => n.toFixed(2)).join(",");
+  const layers = ["MODIS_Terra_CorrectedReflectance_TrueColor", WORLDVIEW_LAYERS[layer], "Coastlines_15m"]
+    .filter(Boolean)
+    .join(",");
+  return `https://worldview.earthdata.nasa.gov/?v=${box}&l=${layers}`;
+}
+
 export function levelWord(layer: LayerId, s: EarthSample) {
   if (layer === "ocean" && s.land > 0.6) return "no sea here — try the blue ocean";
   return LAYERS[layer].levels[levelIndex(layerStrength(layer, s))];
@@ -208,6 +225,22 @@ export function DiscoveryDialog({
               <Square aria-hidden="true" /> Stop and close
             </Button>
           </div>
+
+          {spot && (
+            <a
+              href={worldviewUrl(spot.lat, spot.lng, layer)}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between gap-3 rounded-2xl border-2 border-border p-4 text-lg font-bold hover:border-primary"
+            >
+              <span>
+                See today's satellite picture of this place in NASA Worldview
+                <span className="block text-sm font-normal text-muted-foreground">For grown-ups and sighted helpers</span>
+              </span>
+              <ExternalLink className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          )}
 
           <p className="text-sm text-muted-foreground">
             Image:{" "}

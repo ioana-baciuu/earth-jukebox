@@ -9,7 +9,7 @@ import { useA11y, type A11ySettings } from "@/lib/a11y";
 const TOGGLES: { key: keyof A11ySettings; label: string; hint: string }[] = [
   { key: "narrate", label: "Read aloud", hint: "A friendly voice tells you where you are and what you hear." },
   { key: "bigText", label: "Big text", hint: "Makes all words and buttons larger." },
-  { key: "highContrast", label: "High contrast", hint: "Pure black and white with bright yellow buttons." },
+  { key: "highContrast", label: "High contrast", hint: "Pure black and white with bright pink buttons." },
   { key: "vibrate", label: "Vibrate on thunder", hint: "Phones and tablets buzz when thunder booms." },
   { key: "calmMotion", label: "Calm motion", hint: "Stops spinning, flashes and moving rings." },
 ];

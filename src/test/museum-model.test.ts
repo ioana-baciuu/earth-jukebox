@@ -12,3 +12,18 @@ describe("Museum rules", () => {
   it("bundles 48 extracted frames for each of the four datasets", () => { for(const seq of Object.values(SEQUENCES)){expect(seq.frameCount).toBe(48);expect(seq.grids).toHaveLength(48);expect(seq.columns*seq.rows).toBe(48);} });
   it("does not interpret rotating GEDI movie pixels as geographic height", () => expect(frameValue("forest",12,0,0)).toBeUndefined());
 });
+import { dayPhase, nightShare, DAY_PHASE_LABEL } from "@/lib/museum-model";
+describe("day/night globe label", () => {
+  const sun = { lat: 0, lng: 0 };
+  it("labels the point opposite the Sun as the night side with city lights", () => {
+    expect(dayPhase(0, 180, sun)).toBe("night");
+    expect(DAY_PHASE_LABEL.night).toBe("Night Side — City Lights Active");
+  });
+  it("labels the point under the Sun as day", () => expect(dayPhase(0, 0, sun)).toBe("day"));
+  it("labels the 90° line as the sunrise/sunset band", () => expect(dayPhase(0, 90, sun)).toBe("twilight"));
+  it("reports how much of the view is night", () => {
+    expect(nightShare(0, 0, sun)).toBe(0);
+    expect(nightShare(0, 180, sun)).toBe(100);
+    expect(nightShare(0, 90, sun)).toBe(50);
+  });
+});

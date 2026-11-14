@@ -10,7 +10,7 @@
 
 /*
  * Earth Jukebox design system — "night sky planetarium".
- * Deep space navy, sunny high-contrast yellow for actions, one vivid colour per Earth layer.
+ * Deep space navy, soft high-contrast pink for actions, one vivid colour per Earth layer.
  * Built for low-vision kids: big type (Atkinson Hyperlegible), thick focus rings, no colour-only cues.
  */
 
@@ -86,7 +86,7 @@
   --card-foreground: oklch(0.97 0.012 95);
   --popover: oklch(0.21 0.05 264);
   --popover-foreground: oklch(0.97 0.012 95);
-  --primary: oklch(0.88 0.17 92);
+  --primary: oklch(0.84 0.1 350);
   --primary-foreground: oklch(0.18 0.05 264);
   --secondary: oklch(0.3 0.06 264);
   --secondary-foreground: oklch(0.97 0.012 95);
@@ -98,16 +98,16 @@
   --destructive-foreground: oklch(0.18 0.05 264);
   --border: oklch(0.4 0.06 264);
   --input: oklch(0.4 0.06 264);
-  --ring: oklch(0.88 0.17 92);
+  --ring: oklch(0.84 0.1 350);
   --glow: oklch(0.8 0.12 205);
 
   --layer-rain: oklch(0.8 0.12 235);
   --layer-storm: oklch(0.82 0.13 290);
   --layer-ocean: oklch(0.8 0.12 190);
-  --layer-lights: oklch(0.85 0.15 75);
+  --layer-lights: oklch(0.8 0.12 55);
   --layer-forest: oklch(0.82 0.17 145);
-  --layer-dust: oklch(0.8 0.13 350);
-  --layer-co2: oklch(0.78 0.14 40);
+  --layer-dust: oklch(0.8 0.04 60);
+  --layer-co2: oklch(0.74 0.14 20);
   --layer: var(--primary);
   --layer-foreground: oklch(0.18 0.05 264);
 
@@ -118,7 +118,7 @@
     ),
     radial-gradient(ellipse at 100% 100%, oklch(0.32 0.09 205 / 0.25), transparent 55%),
     var(--space);
-  --gradient-sun: linear-gradient(135deg, oklch(0.9 0.16 95), oklch(0.82 0.17 70));
+  --gradient-sun: linear-gradient(135deg, oklch(0.9 0.07 350), oklch(0.78 0.13 345));
   --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--layer) 40%, transparent),
     0 18px 50px -18px color-mix(in oklab, var(--layer) 70%, transparent);
   --shadow-card: 0 20px 60px -30px oklch(0 0 0 / 0.8);
@@ -152,8 +152,8 @@
   --muted-foreground: oklch(1 0 0);
   --border: oklch(1 0 0);
   --input: oklch(1 0 0);
-  --primary: oklch(0.92 0.19 100);
-  --ring: oklch(0.92 0.19 100);
+  --primary: oklch(0.87 0.12 350);
+  --ring: oklch(0.87 0.12 350);
   --gradient-space: var(--space);
 }
 
@@ -387,3 +387,13 @@
 .museum-joystick { text-align:center; border-left:1px solid var(--border); padding-left:20px; }
 .joystick-stick { width:36px; height:55px; display:block; border-radius:50% 50% 8px 8px; border:3px solid var(--border); background:var(--foreground); box-shadow:var(--shadow-card); transform:rotate(-8deg); }
 @media(max-width:800px) { .museum-console { grid-template-columns:1fr; } .museum-globe-stage { height:340px; } .museum-tablet-zone { padding:16px; } .museum-controls { grid-template-columns:1fr; padding:16px; } .museum-joystick { border-left:0; border-top:1px solid var(--border); padding:16px 0 0; } }
+
+/* Day/night badge over the museum globe */
+.daynight-badge { position:absolute; left:12px; bottom:12px; z-index:5; display:flex; flex-direction:column; gap:6px; min-width:220px; max-width:calc(100% - 24px); padding:10px 14px; border-radius:12px; border:2px solid var(--border); background:color-mix(in oklab,var(--space) 82%,transparent); backdrop-filter:blur(8px); transition:border-color .4s ease; pointer-events:none; }
+.daynight-badge[data-phase=night] { border-color:var(--primary); }
+.daynight-meter { height:8px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--muted)); overflow:hidden; }
+.daynight-meter > span { display:block; height:100%; background:var(--primary); transition:width .35s ease; }
+.station-stage { position:relative; height:560px; border-radius:8px; overflow:hidden; border:2px solid var(--border); background:radial-gradient(circle at 50% 35%, color-mix(in oklab,var(--primary) 14%,var(--card)), var(--space) 70%); }
+.station-hotspot { display:grid; place-items:center; width:34px; height:34px; border-radius:999px; background:var(--primary); color:var(--primary-foreground); font-weight:800; font-family:var(--font-display); border:3px solid var(--space); box-shadow:0 0 0 2px var(--primary); cursor:pointer; transition:transform .2s ease; }
+.station-hotspot[aria-pressed=true] { transform:scale(1.25); background:var(--foreground); box-shadow:0 0 0 3px var(--primary), 0 0 24px 6px color-mix(in oklab,var(--primary) 55%,transparent); }
+@media(max-width:800px){ .station-stage{ height:420px; } }

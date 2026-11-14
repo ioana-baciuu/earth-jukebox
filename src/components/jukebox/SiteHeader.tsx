@@ -19,8 +19,8 @@ export function SiteHeader() {
           </span>
           <span className="font-display text-xl font-bold tracking-tight sm:text-2xl">Earth Jukebox</span>
         </Link>
-        <nav aria-label="Main" className="order-3 w-full overflow-x-auto sm:order-none sm:ml-auto sm:w-auto">
-          <ul className="flex items-center gap-1">
+        <nav aria-label="Main" className="order-3 w-full sm:order-none sm:ml-auto sm:w-auto">
+          <ul className="flex flex-wrap items-center gap-1">
             {NAV.map((n) => (
               <li key={n.to}>
                 <Link

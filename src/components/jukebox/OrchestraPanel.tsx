@@ -170,7 +170,7 @@ export function OrchestraPanel({ mix, setMix, playing, onToggle, speed, setSpeed
                   max={1}
                   step={0.05}
                   value={[m.vol]}
-                  onValueChange={([vol]) => setMix({ ...mix, [id]: { ...m, vol } })}
+                  onValueChange={([vol]) => setMix({ ...mix, [id]: { ...m, vol: vol ?? m.vol } })}
                 />
                 <div className="meter-track h-3 w-16 shrink-0 overflow-hidden rounded-full" aria-hidden="true">
                   <div className="meter-fill h-full transition-[width] duration-300" style={{ width: `${m.on ? v * 100 : 0}%` }} />

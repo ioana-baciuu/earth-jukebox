@@ -15,7 +15,7 @@ export function SoundBars({ playing, calm }: { playing: boolean; calm: boolean }
         e.analyser.getByteFrequencyData(data);
         const kids = el.children;
         for (let i = 0; i < kids.length; i++) {
-          const v = data[2 + i * 5] / 255;
+          const v = (data[2 + i * 5] ?? 0) / 255;
           (kids[i] as HTMLElement).style.transform = `scaleY(${0.12 + v * 0.88})`;
         }
       }

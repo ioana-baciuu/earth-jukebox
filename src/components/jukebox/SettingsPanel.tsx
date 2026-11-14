@@ -64,7 +64,7 @@ export function SettingsPanel() {
               max={1}
               step={0.05}
               value={[settings.volume]}
-              onValueChange={([v]) => set("volume", v)}
+              onValueChange={([v]) => set("volume", v ?? 0.85)}
             />
           </div>
           <div className="rounded-2xl border border-border p-4">

@@ -93,7 +93,7 @@ function Index() {
     listen(p.lat, p.lng, p.name);
   };
 
-  const surprise = () => visit(FEATURED_PLACES[Math.floor(Math.random() * FEATURED_PLACES.length)]);
+  const surprise = () => visit(FEATURED_PLACES[Math.floor(Math.random() * FEATURED_PLACES.length)] ?? FEATURED_PLACES[0]!);
 
   const chooseLayer = (id: LayerId) => {
     setLayer(id);
@@ -146,7 +146,7 @@ function Index() {
       const idx = Number(e.key) - 1;
       if (idx >= 0 && idx < LAYER_IDS.length) {
         setMode("explore");
-        chooseLayer(LAYER_IDS[idx]);
+        chooseLayer(LAYER_IDS[idx]!);
       } else if (e.key.toLowerCase() === "s") {
         stopAll();
         announce("Sound stopped.");

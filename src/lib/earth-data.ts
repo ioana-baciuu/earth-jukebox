@@ -52,7 +52,7 @@ export function sampleGrid(key: GridKey, lat: number, lng: number, nearest = fal
   if (nearest) {
     const xi = ((Math.round(x) % GRID_W) + GRID_W) % GRID_W;
     const yi = Math.max(0, Math.min(GRID_H - 1, Math.round(y)));
-    return g[yi * GRID_W + xi] / 255;
+    return (g[yi * GRID_W + xi] ?? 0) / 255;
   }
   const x0 = Math.floor(x);
   const y0 = Math.max(0, Math.min(GRID_H - 1, Math.floor(y)));
@@ -62,10 +62,10 @@ export function sampleGrid(key: GridKey, lat: number, lng: number, nearest = fal
   const xa = ((x0 % GRID_W) + GRID_W) % GRID_W;
   const xb = (xa + 1) % GRID_W;
   const v =
-    g[y0 * GRID_W + xa] * (1 - fx) * (1 - fy) +
-    g[y0 * GRID_W + xb] * fx * (1 - fy) +
-    g[y1 * GRID_W + xa] * (1 - fx) * fy +
-    g[y1 * GRID_W + xb] * fx * fy;
+    (g[y0 * GRID_W + xa] ?? 0) * (1 - fx) * (1 - fy) +
+    (g[y0 * GRID_W + xb] ?? 0) * fx * (1 - fy) +
+    (g[y1 * GRID_W + xa] ?? 0) * (1 - fx) * fy +
+    (g[y1 * GRID_W + xb] ?? 0) * fx * fy;
   return v / 255;
 }
 

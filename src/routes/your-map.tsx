@@ -67,7 +67,7 @@ function analyse(img: HTMLImageElement): Analysis {
       for (let y = b * 8; y < b * 8 + 8; y++)
         for (let x = col * 4; x < col * 4 + 4; x++) {
           const i = (y * w + x) * 4;
-          const r = d[i], g = d[i + 1], bl = d[i + 2];
+          const r = d[i] ?? 0, g = d[i + 1] ?? 0, bl = d[i + 2] ?? 0;
           sum += (0.3 * r + 0.59 * g + 0.11 * bl) / 255;
           warmScore += (r - bl) / 255;
           n++;
@@ -121,7 +121,7 @@ function YourMap() {
       const e = peekEngine();
       if (!e) return;
       const c = colRef.current;
-      const bands = analysis.bright[c];
+      const bands = analysis.bright[c] ?? [];
       const minor = !analysis.warm[c];
       const pan = (c / (COLS - 1)) * 2 - 1;
       bands.forEach((v, b) => {
@@ -211,7 +211,7 @@ function YourMap() {
               <p id="tempo-label" className="font-bold">
                 Speed
               </p>
-              <Slider className="mt-3" aria-labelledby="tempo-label" min={0} max={1} step={0.1} value={[tempo]} onValueChange={([v]) => setTempo(v)} />
+              <Slider className="mt-3" aria-labelledby="tempo-label" min={0} max={1} step={0.1} value={[tempo]} onValueChange={([v]) => setTempo(v ?? 0.5)} />
             </div>
             {analysis && (
               <Button variant="link" className="px-0 text-base" onClick={() => speak(analysis.summary, { force: true })}>

@@ -78,5 +78,5 @@ export function pentatonicFreq(rootMidi: number, step: number, minor = false) {
   const scale = minor ? PENTATONIC_MINOR : PENTATONIC_MAJOR;
   const oct = Math.floor(step / scale.length);
   const deg = ((step % scale.length) + scale.length) % scale.length;
-  return midiToFreq(rootMidi + oct * 12 + scale[deg]);
+  return midiToFreq(rootMidi + oct * 12 + (scale[deg] ?? 0));
 }

@@ -135,7 +135,7 @@ class RainVoice extends Voice {
   private hiss!: GainNode;
   private hissFilter!: BiquadFilterNode;
   private nextThunder = 0;
-  protected startContinuous() {
+  protected override startContinuous() {
     const src = this.loopNoise("pink");
     const hp = this.ctx.createBiquadFilter();
     hp.type = "highpass";
@@ -148,13 +148,13 @@ class RainVoice extends Voice {
     src.connect(hp).connect(this.hissFilter).connect(this.hiss).connect(this.out);
     super.startContinuous();
   }
-  protected update() {
+  protected override update() {
     const h = rainHissLevel(this.value);
     const t = this.ctx.currentTime;
     this.hiss.gain.setTargetAtTime(h * 0.55, t, 0.6);
     this.hissFilter.frequency.setTargetAtTime(2500 + h * 5000, t, 0.6);
   }
-  schedule(from: number, to: number) {
+  override schedule(from: number, to: number) {
     const rate = raindropsPerSecond(this.value);
     for (const t of this.poisson(rate, from, to)) this.drop(t);
     if (rainBringsThunder(this.value)) {
@@ -205,7 +205,7 @@ class RainVoice extends Voice {
 class StormVoice extends Voice {
   private next = 0;
   private bed!: GainNode;
-  protected startContinuous() {
+  protected override startContinuous() {
     const src = this.loopNoise("pink");
     const lp = this.ctx.createBiquadFilter();
     lp.type = "lowpass";
@@ -215,10 +215,10 @@ class StormVoice extends Voice {
     src.connect(lp).connect(this.bed).connect(this.out);
     super.startContinuous();
   }
-  protected update() {
+  protected override update() {
     this.bed.gain.setTargetAtTime(this.value * 0.12, this.ctx.currentTime, 0.8);
   }
-  schedule(from: number, to: number) {
+  override schedule(from: number, to: number) {
     const iv = thunderIntervalSeconds(this.value);
     if (!isFinite(iv)) return;
     if (this.next < from) this.next = from + rand(0.3, 1.5);
@@ -238,7 +238,7 @@ class OceanVoice extends Voice {
   private padGain!: GainNode;
   private nextWave = 0;
   private nextWhale = 0;
-  protected startContinuous() {
+  protected override startContinuous() {
     const ctx = this.ctx;
     const src = this.loopNoise("brown");
     this.waveFilter = ctx.createBiquadFilter();
@@ -274,7 +274,7 @@ class OceanVoice extends Voice {
   private presence() {
     return this.sample ? 1 - Math.min(1, this.sample.land * 1.2) : 1;
   }
-  protected update() {
+  protected override update() {
     const t = this.ctx.currentTime;
     const mood = oceanMood(this.value);
     const chords: Record<string, number[]> = {
@@ -282,12 +282,12 @@ class OceanVoice extends Voice {
       mild: [50, 55, 57], // D sus, middle
       warm: [60, 64, 67], // C major, bright
     };
-    chords[mood].forEach((m, i) => {
-      this.pad[i].frequency.setTargetAtTime(440 * Math.pow(2, (m - 69) / 12), t, 0.8);
+    chords[mood]!.forEach((m, i) => {
+      this.pad[i]!.frequency.setTargetAtTime(440 * Math.pow(2, (m - 69) / 12), t, 0.8);
     });
     this.padGain.gain.setTargetAtTime(0.05 + 0.06 * this.presence(), t, 1);
   }
-  schedule(from: number, to: number) {
+  override schedule(from: number, to: number) {
     const pres = this.presence();
     if (this.nextWave < from) this.nextWave = from + 0.1;
     while (this.nextWave < to) {
@@ -339,7 +339,7 @@ class OceanVoice extends Voice {
 
 /* ---------------- City lights: music-box bells ---------------- */
 class LightsVoice extends Voice {
-  schedule(from: number, to: number) {
+  override schedule(from: number, to: number) {
     const rate = bellNotesPerSecond(this.value);
     for (const t of this.poisson(rate, from, to)) {
       const step = Math.floor(rand(0, 6 + this.value * 6));
@@ -355,7 +355,7 @@ class LightsVoice extends Voice {
 class ForestVoice extends Voice {
   private rustle!: GainNode;
   private nextCuckoo = 0;
-  protected startContinuous() {
+  protected override startContinuous() {
     const src = this.loopNoise("pink");
     const bp = this.ctx.createBiquadFilter();
     bp.type = "bandpass";
@@ -366,10 +366,10 @@ class ForestVoice extends Voice {
     src.connect(bp).connect(this.rustle).connect(this.out);
     super.startContinuous();
   }
-  protected update() {
+  protected override update() {
     this.rustle.gain.setTargetAtTime(0.03 + this.value * 0.12, this.ctx.currentTime, 1);
   }
-  schedule(from: number, to: number) {
+  override schedule(from: number, to: number) {
     for (const t of this.poisson(birdsPerSecond(this.value), from, to)) {
       this.tweet(t);
       if (Math.random() < 0.15) this.e.emit({ layer: "forest", kind: "bird", strength: this.value });
@@ -437,7 +437,7 @@ class DustVoice extends Voice {
   private whistle!: BiquadFilterNode;
   private whistleG!: GainNode;
   private sand!: GainNode;
-  protected startContinuous() {
+  protected override startContinuous() {
     const ctx = this.ctx;
     const src = this.loopNoise("pink");
     this.windBp = ctx.createBiquadFilter();
@@ -463,7 +463,7 @@ class DustVoice extends Voice {
     w.connect(hp).connect(this.sand).connect(this.out);
     super.startContinuous();
   }
-  protected update() {
+  protected override update() {
     const t = this.ctx.currentTime;
     const v = this.value;
     const type = this.sample?.dustType ?? 0;
@@ -471,7 +471,7 @@ class DustVoice extends Voice {
     this.whistleG.gain.setTargetAtTime(v > 0.3 ? 0.4 * v : 0, t, 1);
     this.sand.gain.setTargetAtTime(type === 1 ? 0.05 * v : 0.006 * v, t, 1);
   }
-  schedule(from: number, to: number) {
+  override schedule(from: number, to: number) {
     const v = this.value;
     // gusts: random walk of the wind's colour
     const f = rand(280, 600 + 900 * v);
@@ -507,7 +507,7 @@ class Co2Voice extends Voice {
   constructor(e: AudioEngine, id: LayerId) {
     super(e, id, 0.5);
   }
-  protected startContinuous() {
+  protected override startContinuous() {
     const ctx = this.ctx;
     this.lp = ctx.createBiquadFilter();
     this.lp.type = "lowpass";
@@ -535,18 +535,18 @@ class Co2Voice extends Voice {
     });
     super.startContinuous();
   }
-  protected update() {
+  protected override update() {
     const t = this.ctx.currentTime;
     const v = this.value;
     const cents = droneDetuneCents(v);
     const voices = 2 + Math.round(v * 3);
     this.oscs.forEach((o, i) => {
       o.detune.setTargetAtTime(i === 0 ? 0 : (i % 2 ? 1 : -1) * cents * (0.5 + i * 0.25), t, 1.2);
-      this.oscG[i].gain.setTargetAtTime(i < voices ? (i < 2 ? 0.22 : 0.07) : 0, t, 1.2);
+      this.oscG[i]!.gain.setTargetAtTime(i < voices ? (i < 2 ? 0.22 : 0.07) : 0, t, 1.2);
     });
     this.lp.frequency.setTargetAtTime(280 + 1400 * v, t, 1.2);
   }
-  schedule() {}
+  override schedule() {}
 }
 
 const VOICE_CLASSES: Record<LayerId, new (e: AudioEngine, id: LayerId) => Voice> = {
@@ -715,11 +715,13 @@ export class AudioEngine {
     const p = ctx.createStereoPanner();
     p.pan.value = pan;
     p.connect(dest);
-    [
-      [1, 1, 1.4],
-      [2.76, 0.35, 0.5],
-      [5.4, 0.12, 0.25],
-    ].forEach(([mult, amp, dec]) => {
+    (
+      [
+        [1, 1, 1.4],
+        [2.76, 0.35, 0.5],
+        [5.4, 0.12, 0.25],
+      ] as const
+    ).forEach(([mult, amp, dec]) => {
       const o = ctx.createOscillator();
       o.type = "sine";
       o.frequency.value = f * mult;
@@ -743,10 +745,12 @@ export class AudioEngine {
     const s = ctx.createGain();
     s.gain.value = 0.3;
     p.connect(s).connect(this.reverbIn);
-    [
-      [1, 1, 0.7],
-      [4, 0.18, 0.12],
-    ].forEach(([m, a, d]) => {
+    (
+      [
+        [1, 1, 0.7],
+        [4, 0.18, 0.12],
+      ] as const
+    ).forEach(([m, a, d]) => {
       const o = ctx.createOscillator();
       o.type = "sine";
       o.frequency.value = f * m;

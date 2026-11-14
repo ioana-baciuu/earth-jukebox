@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Ear, Hand, Headphones, Keyboard, Monitor, Repeat, School, Vibrate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MuseumSimulator } from "@/components/jukebox/MuseumSimulator";
+import { StationShowcase } from "@/components/jukebox/station/StationShowcase";
+import { STATION_PARTS } from "@/lib/station-parts";
 
 export const Route = createFileRoute("/museum")({
   head: () => ({
@@ -21,13 +23,8 @@ export const Route = createFileRoute("/museum")({
   component: MuseumPage,
 });
 
-const PARTS = [
-  { n: 1, icon: Hand, title: "Touch globe", text: "3D-printed raised continents and mountains. Touch sensors under the surface tell the app which place a child is touching." },
-  { n: 2, icon: Keyboard, title: "Four-button panel", text: "Sea temperature, lightning, forest height and night lights. Raised symbols and professionally checked Braille identify the buttons. A one-axis joystick rotates east and west; north stays upright." },
-  { n: 3, icon: Headphones, title: "Headphones", text: "Stereo headphones: places in the west sound in the left ear, east in the right. Higher notes mean north, lower notes mean south." },
-  { n: 4, icon: Vibrate, title: "Thermal and vibration pad", text: "Proposed touch feedback: gentle warmth or coolness for sea temperature, vibration for thunder and coastlines. No physical temperature control is connected to this web demo." },
-  { n: 5, icon: Monitor, title: "Companion tablet", text: "Plays extracted NASA image sequences. Touching a flat map selects the same place on the globe and changes the sound. The rotating GEDI movie is a visual explanation, not a geographic touch map." },
-];
+const PART_ICONS = { globe: Hand, panel: Keyboard, headphones: Headphones, pad: Vibrate, tablet: Monitor } as const;
+const PARTS = STATION_PARTS.map((p) => ({ ...p, icon: PART_ICONS[p.id] }));
 
 const FLOW = [
   { t: "Welcome", d: "Choose a dataset and press Where am I? to hear the selected location." },
@@ -174,6 +171,8 @@ function MuseumPage() {
       </p>
 
        <div className="mt-8"><MuseumSimulator /></div>
+
+      <StationShowcase />
 
       <section aria-labelledby="station-title" className="mt-10 grid items-start gap-8 lg:grid-cols-[1.2fr_1fr]">
         <div className="surface p-4 sm:p-6">

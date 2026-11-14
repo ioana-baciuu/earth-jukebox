@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as MuseumRouteImport } from './routes/museum'
 import { Route as YourMapRouteImport } from './routes/your-map'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MuseumRoute = MuseumRouteImport.update({
+  id: '/museum',
+  path: '/museum',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const YourMapRoute = YourMapRouteImport.update({
   id: '/your-map',
   path: '/your-map',
@@ -32,30 +38,34 @@ const YourMapRoute = YourMapRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/your-map'
+  fullPaths: '/' | '/about' | '/museum' | '/your-map'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/your-map'
-  id: '__root__' | '/' | '/about' | '/your-map'
+  to: '/' | '/about' | '/museum' | '/your-map'
+  id: '__root__' | '/' | '/about' | '/museum' | '/your-map'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  MuseumRoute: typeof MuseumRoute
   YourMapRoute: typeof YourMapRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/museum': {
+      id: '/museum'
+      path: '/museum'
+      fullPath: '/museum'
+      preLoaderRoute: typeof MuseumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/your-map': {
       id: '/your-map'
       path: '/your-map'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  MuseumRoute: MuseumRoute,
   YourMapRoute: YourMapRoute,
 }
 export const routeTree = rootRouteImport

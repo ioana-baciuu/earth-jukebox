@@ -135,7 +135,7 @@ function About() {
           <li><a className="underline" href="https://svs.gsfc.nasa.gov/5276/">NASA SVS 5276: Black Marble night lights</a> — annual composite images, 2012–2023. Repeated extracted frames can show the same annual image.</li>
           <li><a className="underline" href="https://visibleearth.nasa.gov/collection/1484/blue-marble">NASA Blue Marble</a> — Earth textures and the existing vegetation proxy.</li>
           <li>CYSA Sphere authors the teaching comparisons, friendly level words, image descriptions, sound choices and proposed museum design. They are interpretations of the linked NASA visualizations, not NASA quotations or validated scientific statements.</li>
-          <li>Erie, Umwelt and DIXTRAL inspired earlier research discussions; this prototype does not run those libraries or claim compliance with their evaluation protocols. User comprehension and accessibility have not yet been tested with blind children.</li>
+          <li>Our own code follows ideas from Erie (one declarative value→sound rule per layer), Umwelt (the marker, sound and spoken caption come from one shared snapshot), DIXTRAL (the P-key instant probe) and A Universe of Sound (the visitor feedback questions). These libraries are not bundled and we do not claim compliance with their protocols; feedback answers stay on the visitor's device. User comprehension and accessibility have not yet been tested with blind children.</li>
         </ul>
       </section>
       <div className="mt-12 flex flex-wrap gap-3">

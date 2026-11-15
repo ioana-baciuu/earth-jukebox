@@ -39,3 +39,4 @@ use the editor.
 - Keep the museum station scene lazily client-loaded, with its five parts defined by the shared station-parts list, so drawings and descriptions stay aligned.
 - Model the fourth station part as a globe-surface feedback overlay sharing the globe camera target, not as a separate mesh on the pedestal, so the prototype illustrates integrated touch hardware.
 - Project 3D station hotspots into buttons owned by the page's React root; avoid separate Html roots that race during React 19 cleanup.
+- Research-inspired sonification rules (Erie specs, DIXTRAL probe, Umwelt snapshot, evaluation validator) live in `src/lib/sonification-spec.ts` with tests in `src/test/`; route files only export `Route`, so never embed helpers or in-source tests there.

@@ -17,6 +17,8 @@ import { coastCrossing, latitudeToFreq, longitudeToPan, pentatonicFreq } from "@
 import { MeetTheSounds } from "@/components/jukebox/MeetTheSounds";
 import { ContrastStories } from "@/components/jukebox/ContrastStories";
 import { cn } from "@/lib/utils";
+import { createUmweltSnapshot, ERIE_SPECS, erieFor } from "@/lib/sonification-spec";
+import { EvaluationForm } from "@/components/jukebox/EvaluationForm";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -56,6 +58,7 @@ function Index() {
   const [cursor, setCursor] = useState<{ lat: number; lng: number } | null>(null);
   const [spot, setSpot] = useState<Spot | null>(null);
   const [open, setOpen] = useState(false);
+  const [caption, setCaption] = useState("");
 
   // Orchestra state
   const [mix, setMix] = useState<Mix>(DEFAULT_MIX);
@@ -126,6 +129,19 @@ function Index() {
       speak(`${describePlace(base.lat, base.lng, sampleEarth(base.lat, base.lng).land > 0.5)}. ${formatCoords(base.lat, base.lng)}.`, { force: true });
       return;
     }
+    else if (e.key.toLowerCase() === "p") {
+      e.preventDefault();
+      const spec = erieFor(layer);
+      if (!spec) return;
+      const s0 = sampleEarth(base.lat, base.lng);
+      const snap = createUmweltSnapshot(base.lat, base.lng, describePlace(base.lat, base.lng, s0.land > 0.5), spec.id, layerStrength(layer, s0));
+      const eng = await getEngine();
+      eng.marimba(snap.audioSynthParams.frequency, 0.4, longitudeToPan(base.lng));
+      const text = spec.id === "ocean" && s0.land > 0.5 ? `${snap.target.name}. On land, no sea here. ${formatCoords(base.lat, base.lng)}.` : snap.ariaLiveCaption;
+      setCaption(text);
+      speak(text, { force: true });
+      return;
+    }
     else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       if (mode === "explore") listen(base.lat, base.lng);
@@ -150,6 +166,8 @@ function Index() {
       eng.coast(crossing === "to-land", pan);
       buzz(crossing === "to-land" ? [40, 30, 80] : [120]);
     }
+    const spec = erieFor(layer);
+    if (spec && !(spec.id === "ocean" && s.land > 0.5)) setCaption(createUmweltSnapshot(lat, lng, describePlace(lat, lng, s.land > 0.5), spec.id, v).ariaLiveCaption);
     if (announceTimer.current) clearTimeout(announceTimer.current);
     announceTimer.current = setTimeout(() => {
       announce(`${crossing === "to-land" ? "Land ahead! " : crossing === "to-water" ? "Splash, into the sea. " : ""}${describePlace(lat, lng, s.land > 0.5)}. ${LAYERS[layer].name}: ${levelWord(layer, s)}.`);
@@ -404,6 +422,27 @@ function Index() {
         </div>
       </section>
 
+      <section aria-labelledby="rules-title" className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <h2 id="rules-title" className="font-display text-4xl font-bold">How each sound follows the data</h2>
+        <p className="mt-2 text-lg text-muted-foreground">
+          One clear rule per sound. On the globe, press <kbd className="rounded bg-muted px-1.5">P</kbd> for an instant probe that says where you are and what the data shows.
+        </p>
+        <p id="probe-caption" aria-live="polite" className="mt-4 min-h-[1.75rem] text-lg font-bold text-primary">{caption}</p>
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {LAYER_IDS.map((id) => {
+            const spec = erieFor(id) ?? ERIE_SPECS.ocean;
+            return (
+              <li key={id} className={cn(`layer-${id}`, "layer-tile flex flex-col gap-2 rounded-2xl p-5")}>
+                <span className="inline-flex items-center gap-2 text-xl font-bold"><LayerIcon id={id} className="h-5 w-5 text-layer" />{LAYERS[id].name}</span>
+                <span className="text-base">{spec.legend.low} → {spec.legend.mid} → {spec.legend.high}</span>
+                <span className="text-sm text-muted-foreground">{spec.legend.speechRule}</span>
+                <span className="mt-auto pt-2 text-xs font-bold uppercase text-muted-foreground">{spec.outputRange[0]} → {spec.outputRange[1]} {spec.unit}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
       <MeetTheSounds />
       <ContrastStories onVisit={(p, l) => { setLayer(l); visit(p); }} />
 
@@ -472,6 +511,8 @@ function Index() {
           </div>
         </div>
       </section>
+
+      <EvaluationForm />
 
       <DiscoveryDialog
         open={open}

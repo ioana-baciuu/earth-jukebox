@@ -36,7 +36,7 @@ const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [nu
   panel: { label: [0.05, 0.76, 0.46], cam: [0.15, 1.1, 1.05], target: [0, 0.62, 0.33] },
   headphones: { label: [-0.6, 0.6, 0.1], cam: [-1.2, 1.2, 1.6], target: [-0.3, 0.8, 0.55] },
   feedback: { label: [-0.22, 1.12, 0.34], cam: [0.55, 1.25, 1.2], target: [0, 1.04, 0.04] },
-  tablet: { label: [0.5, 1.26, 0.2], cam: [0.95, 1.05, 1.0], target: [0.42, 0.92, 0.14] },
+  tablet: { label: [0.5, 1.26, 0.28], cam: [0.95, 1.05, 1.0], target: [0.42, 0.92, 0.14] },
 };
 
 function useCanvasTexture(draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void, w = 512, h = 512) {
@@ -386,15 +386,15 @@ function Tablet({ state }: { state: KioskState }) {
   return (
     <group>
       {/* base plate screwed onto the tabletop, then the arm */}
-      <mesh position={[0.4, 0.83, 0.12]}>
+      <mesh position={[0.42, 0.83, 0.2]}>
         <cylinderGeometry args={[0.045, 0.05, 0.02, 24]} />
         <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
       </mesh>
-      <mesh position={[0.4, 0.94, 0.12]}>
+      <mesh position={[0.42, 0.94, 0.2]}>
         <cylinderGeometry args={[0.012, 0.016, 0.22, 16]} />
         <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
       </mesh>
-      <group position={[0.42, 1.12, 0.14]} rotation={[-0.25, -0.45, 0]}>
+      <group position={[0.44, 1.12, 0.22]} rotation={[-0.25, -0.45, 0]}>
         <RoundedBox args={[0.28, 0.165, 0.014]} radius={0.01} smoothness={3} castShadow>
           <meshStandardMaterial color={C.rubber} roughness={0.4} metalness={0.2} />
         </RoundedBox>

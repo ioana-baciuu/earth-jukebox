@@ -31,14 +31,15 @@ export function StationShowcase() {
   const part = STATION_PARTS.find((p) => p.id === selected);
   const [kiosk, setKiosk] = useState<KioskState>({ layer: "ocean", lng: -40, lastAction: "nothing yet", pressed: null, pressedAt: 0, tilt: 0 });
   const press = (a: KioskAction) => {
-    setKiosk((k) => {
+    {
+      const k = kiosk;
       const layer: MuseumLayer = a === "ocean" || a === "storm" || a === "forest" || a === "lights" ? a : k.layer;
       const lng = a === "west" || a === "east" ? joystickMove({ lat: 0, lng: k.lng }, a === "west" ? -1 : 1).lng : k.lng;
       const label = ACTION_LABEL[a].toUpperCase();
       const place = describePlace(10, lng, sampleEarth(10, lng).land > 0.5);
       announce(a === "where" ? `${place}, ${LAYERS[layer].name}.` : `${ACTION_LABEL[a]}. ${a === "west" || a === "east" ? place : LAYERS[layer].name}.`);
-      return { layer, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 };
-    });
+      setKiosk({ layer, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 });
+    }
   };
   const select = (id: StationPartId | null) => {
     setSelected(id);

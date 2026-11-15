@@ -237,7 +237,7 @@ function Headphones({ worn }: { worn: boolean }) {
 /** Cable from the station jack up to the child's head when the headphones are worn. */
 function WornCable() {
   const cable = useMemo(() => new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.42, 0.72, 0.28), new THREE.Vector3(-0.5, 0.55, 0.45), new THREE.Vector3(-0.52, 0.6, 0.62), new THREE.Vector3(-0.47, 0.88, 0.7),
+    new THREE.Vector3(-0.42, 0.72, 0.28), new THREE.Vector3(-0.5, 0.55, 0.45), new THREE.Vector3(-0.52, 0.6, 0.62), new THREE.Vector3(-0.3, 0.95, 0.74),
   ]), 40, 0.006, 8), []);
   return (
     <group>
@@ -256,7 +256,7 @@ function Child({ worn }: { worn: boolean }) {
   const head = useRef<THREE.Group>(null);
   useFrame(({ clock }) => { if (head.current) head.current.rotation.x = worn ? 0.25 + Math.sin(clock.elapsedTime * 1.5) * 0.03 : 0.25; });
   return (
-    <group position={[-0.34, 0, 0.72]} rotation={[0, Math.PI + 0.35, 0]}>
+    <group position={[-0.22, 0, 0.74]} rotation={[0, -0.35, 0]}>
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * 0.05, 0.25, 0]} castShadow>
           <capsuleGeometry args={[0.04, 0.38, 6, 12]} />

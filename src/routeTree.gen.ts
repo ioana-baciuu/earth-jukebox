@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as MuseumRouteImport } from './routes/museum'
-import { Route as SlidesRouteImport } from './routes/slides'
 import { Route as YourMapRouteImport } from './routes/your-map'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,11 +29,6 @@ const MuseumRoute = MuseumRouteImport.update({
   path: '/museum',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SlidesRoute = SlidesRouteImport.update({
-  id: '/slides',
-  path: '/slides',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const YourMapRoute = YourMapRouteImport.update({
   id: '/your-map',
   path: '/your-map',
@@ -45,14 +39,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/museum': typeof MuseumRoute
-  '/slides': typeof SlidesRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/museum': typeof MuseumRoute
-  '/slides': typeof SlidesRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRoutesById {
@@ -60,22 +52,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/museum': typeof MuseumRoute
-  '/slides': typeof SlidesRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/museum' | '/slides' | '/your-map'
+  fullPaths: '/' | '/about' | '/museum' | '/your-map'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/museum' | '/slides' | '/your-map'
-  id: '__root__' | '/' | '/about' | '/museum' | '/slides' | '/your-map'
+  to: '/' | '/about' | '/museum' | '/your-map'
+  id: '__root__' | '/' | '/about' | '/museum' | '/your-map'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   MuseumRoute: typeof MuseumRoute
-  SlidesRoute: typeof SlidesRoute
   YourMapRoute: typeof YourMapRoute
 }
 
@@ -102,13 +92,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MuseumRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/slides': {
-      id: '/slides'
-      path: '/slides'
-      fullPath: '/slides'
-      preLoaderRoute: typeof SlidesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/your-map': {
       id: '/your-map'
       path: '/your-map'
@@ -123,7 +106,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   MuseumRoute: MuseumRoute,
-  SlidesRoute: SlidesRoute,
   YourMapRoute: YourMapRoute,
 }
 export const routeTree = rootRouteImport

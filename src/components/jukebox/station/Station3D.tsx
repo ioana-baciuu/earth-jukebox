@@ -36,7 +36,7 @@ const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [nu
   panel: { label: [0.05, 0.76, 0.46], cam: [0.15, 1.1, 1.05], target: [0, 0.62, 0.33] },
   headphones: { label: [-0.6, 0.6, 0.1], cam: [-1.2, 1.2, 1.6], target: [-0.3, 0.8, 0.55] },
   feedback: { label: [-0.22, 1.12, 0.34], cam: [0.55, 1.25, 1.2], target: [0, 1.04, 0.04] },
-  tablet: { label: [0.5, 1.06, -0.1], cam: [1.0, 1.05, 0.65], target: [0.46, 0.9, -0.14] },
+  tablet: { label: [0.66, 1.06, 0.2], cam: [1.15, 1.05, 1.0], target: [0.62, 0.92, 0.14] },
 };
 
 function useCanvasTexture(draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void, w = 512, h = 512) {

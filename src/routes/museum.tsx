@@ -1,6 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Ear, Hand, Headphones, Keyboard, Monitor, Repeat, School, Vibrate } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { createFileRoute } from "@tanstack/react-router";
+import { Hand, Headphones, Keyboard, Monitor, School, Vibrate } from "lucide-react";
 import { MuseumSimulator } from "@/components/jukebox/MuseumSimulator";
 import { StationShowcase } from "@/components/jukebox/station/StationShowcase";
 import { STATION_PARTS } from "@/lib/station-parts";
@@ -27,24 +26,12 @@ const PART_ICONS = { globe: Hand, panel: Keyboard, headphones: Headphones, feedb
 const PARTS = STATION_PARTS.map((p) => ({ ...p, icon: PART_ICONS[p.id] }));
 
 const FLOW = [
-  { t: "Welcome", d: "Choose a dataset and press Where am I? to hear the selected location." },
-  { t: "Meet the sounds", d: "Each button plays ‘a little’ and ‘a lot’ so children learn one rule: more of something means more sound." },
-  { t: "Explore", d: "Touch the globe or move the east/west joystick. Ocean waves, thunder, birds and bells respond to illustrative image-derived values." },
-  { t: "Compare", d: "Guided lessons: Amazon vs Sahara, Congo vs Pacific, Gulf Stream vs Arctic, Tokyo vs open ocean." },
-  { t: "Orchestra", d: "Turn every dataset on at once and hear the whole planet spin as music." },
-  { t: "Reset", d: "Stop silences the headphones. Reset returns the station to its starting place." },
-];
-
-const FEATURES = [
-  "Real 3D Earth with NASA skins for each dataset",
-  "Tap or touch a place: NASA picture pops up and its sound starts",
-  "Spoken description of what each NASA picture looks like",
-  "Coastline sounds and vibration when you step onto land or into the sea",
-  "North–south pitch beacon and west–east stereo for a mental map",
-  "Keyboard, number pad and screen-reader support",
-  "Big text, high contrast and calm-motion settings",
-  "Orchestra mode: every dataset as an instrument",
-  "48 extracted NASA frames per dataset with original source links",
+  { t: "Put on the headphones", d: "Lift the headphones off the hook. High notes mean north, low notes mean south; west plays in the left ear, east in the right." },
+  { t: "Choose a dataset", d: "Press one of the four Braille keys: Sea Temperature, Lightning, Forest Height or Night Lights. Each one plays its instrument." },
+  { t: "Touch the globe", d: "Feel the raised continents. Under your fingers the globe turns warm or cool over the sea and buzzes softly where storms are." },
+  { t: "Spin the Earth", d: "Push the joystick east or west. The North Pole stays on top while places move into daylight or into the glowing night side." },
+  { t: "Ask “Where am I?”", d: "Press the pink key to hear the place you are touching and what the chosen dataset says about it." },
+  { t: "Play the orchestra", d: "Turn all four instruments on together and hear the whole planet as music." },
 ];
 
 function KioskBlueprint() {
@@ -53,8 +40,8 @@ function KioskBlueprint() {
       <title id="kiosk-t">Earth Jukebox exhibit station drawing</title>
       <desc id="kiosk-d">
         A waist-high wooden pedestal holds a raised touch globe on top. In front of it is a sloped panel with four big
-        round buttons and a joystick. Headphones hang on the left, touch sensations are built into the globe, and a screen
-        stands behind for teachers.
+        round buttons and a joystick. The headphones are cabled to the station, touch sensations are built into the globe, and a screen
+        stands beside it for teachers. A child stands at the front, touching the globe and wearing the headphones.
       </desc>
       <g fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted-foreground" strokeLinejoin="round">
         {/* floor */}
@@ -79,24 +66,38 @@ function KioskBlueprint() {
       </g>
       {/* buttons */}
       {[
-         ["layer-forest", 220],
-        ["layer-storm", 285],
-        ["layer-ocean", 350],
-        ["layer-lights", 415],
+        ["layer-ocean", 200],
+        ["layer-storm", 255],
+        ["layer-forest", 310],
+        ["layer-lights", 365],
       ].map(([cls, x]) => (
         <g key={cls} className={String(cls)}>
-          <circle cx={Number(x)} cy="275" r="20" className="fill-[var(--layer)]" />
+          <circle cx={Number(x)} cy="275" r="18" className="fill-[var(--layer)]" />
         </g>
       ))}
-      {/* joystick */}
-      <circle cx="470" cy="275" r="10" className="fill-foreground" />
-      <line x1="470" y1="275" x2="470" y2="258" stroke="currentColor" strokeWidth="5" className="text-foreground" />
+      {/* Where am I? key */}
+      <rect x="395" y="264" width="34" height="22" rx="5" className="fill-primary" />
+      {/* joystick in an east/west slot */}
+      <rect x="440" y="270" width="50" height="10" rx="5" className="fill-secondary" />
+      <line x1="465" y1="275" x2="465" y2="252" stroke="currentColor" strokeWidth="4" className="text-foreground" />
+      <circle cx="465" cy="250" r="8" className="fill-primary" />
+      {/* child visitor, reaching the globe, wearing the headphones */}
+      <g className="text-foreground" fill="currentColor">
+        <circle cx="585" cy="268" r="24" />
+        <path d="M565 300 q20 -10 40 0 l8 110 h-56 Z" />
+        <rect x="565" y="405" width="14" height="75" rx="6" />
+        <rect x="591" y="405" width="14" height="75" rx="6" />
+        <path d="M568 310 Q520 300 470 255" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
+      </g>
+      <g fill="none" stroke="currentColor" strokeWidth="4" className="text-primary" strokeLinecap="round">
+        <path d="M560 262 a26 26 0 0 1 50 0" />
+        <rect x="555" y="258" width="10" height="18" rx="4" fill="currentColor" />
+        <path d="M560 276 Q540 330 495 300" strokeWidth="2" />
+      </g>
       {/* headphones */}
       <g fill="none" stroke="currentColor" strokeWidth="5" className="text-foreground" strokeLinecap="round">
-        <path d="M70 320 a35 35 0 0 1 70 0" />
-        <rect x="62" y="318" width="16" height="28" rx="6" fill="currentColor" />
-        <rect x="132" y="318" width="16" height="28" rx="6" fill="currentColor" />
-        <path d="M140 330 Q150 300 170 280" strokeWidth="2" />
+        <path d="M105 285 v20" />
+        <line x1="105" y1="285" x2="150" y2="285" />
       </g>
       {/* Touch feedback is integrated into the globe, not a separate hand rest. */}
       {/* labels */}
@@ -104,7 +105,7 @@ function KioskBlueprint() {
         {[
           [1, 205, 70],
           [2, 320, 225],
-          [3, 105, 300],
+          [3, 540, 240],
            [4, 375, 150],
           [5, 600, 60],
         ].map(([n, x, y]) => (
@@ -122,36 +123,33 @@ function KioskBlueprint() {
 
 function ControlPanelBlueprint() {
   const keys = [
+    { cls: "layer-ocean", label: "Sea temp", braille: "⠕⠉⠑⠁" },
+    { cls: "layer-storm", label: "Lightning", braille: "⠞⠓⠥⠝" },
     { cls: "layer-forest", label: "Forest", braille: "⠞⠗⠑⠑" },
-    { cls: "layer-storm", label: "Thunder", braille: "⠞⠓⠥⠝" },
-    { cls: "layer-ocean", label: "Ocean", braille: "⠕⠉⠑⠁" },
-    { cls: "layer-lights", label: "Lights", braille: "⠇⠊⠛⠓" },
+    { cls: "layer-lights", label: "Night lights", braille: "⠇⠊⠛⠓" },
   ];
   return (
-     <div className="surface p-6" role="img" aria-label="Proposed control panel: four buttons for Forest, Thunder, Ocean and Lights; a joystick, Where am I and Stop. Braille is illustrative and requires review.">
-      <div className="grid grid-cols-4 gap-4" aria-hidden="true">
+    <div className="surface p-6" role="img" aria-label="Control panel matching the 3D station, left to right: Sea temperature, Lightning, Forest height and Night lights keys, a pink Where am I key, and an east/west joystick. Braille is illustrative and requires review.">
+      <div className="flex flex-wrap items-end justify-center gap-4 sm:gap-6" aria-hidden="true">
         {keys.map((k) => (
           <div key={k.label} className={`${k.cls} flex flex-col items-center gap-2`}>
-             <span className="layer-chip h-12 w-12 rounded-full shadow-[var(--shadow-glow)] sm:h-20 sm:w-20" />
-             <span className="text-sm font-bold sm:text-lg">{k.label}</span>
-            <span className="text-2xl tracking-widest text-muted-foreground">{k.braille}</span>
+            <span className="layer-chip h-12 w-12 rounded-full shadow-[var(--shadow-glow)] sm:h-16 sm:w-16" />
+            <span className="text-sm font-bold">{k.label}</span>
+            <span className="text-xl tracking-widest text-muted-foreground">{k.braille}</span>
           </div>
         ))}
-      </div>
-      <div className="mt-6 flex items-center justify-around" aria-hidden="true">
         <div className="flex flex-col items-center gap-2">
-          <span className="grid h-20 w-20 place-items-center rounded-full border-4 border-border">
-            <span className="h-8 w-8 rounded-full bg-foreground" />
+          <span className="h-10 w-14 rounded-xl bg-primary sm:h-12 sm:w-16" />
+          <span className="text-sm font-bold">Where am I?</span>
+          <span className="text-xl text-muted-foreground">&nbsp;</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <span className="relative flex h-12 w-24 items-center justify-center">
+            <span className="absolute h-3 w-24 rounded-full bg-secondary" />
+            <span className="relative h-9 w-9 rounded-full bg-primary" />
           </span>
-          <span className="font-bold">Joystick</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-           <span className="h-14 w-20 rounded-2xl bg-primary sm:w-32" />
-          <span className="font-bold">Where am I?</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <span className="h-14 w-14 rounded-xl border-4 border-border bg-secondary" />
-          <span className="font-bold">Stop</span>
+          <span className="text-sm font-bold">◀ West · East ▶</span>
+          <span className="text-xl text-muted-foreground">&nbsp;</span>
         </div>
       </div>
     </div>
@@ -218,33 +216,6 @@ function MuseumPage() {
             </li>
           ))}
         </ol>
-      </section>
-
-      <section aria-labelledby="feat-title" className="mt-14 grid gap-8 lg:grid-cols-2">
-        <div>
-          <h2 id="feat-title" className="font-display text-4xl font-bold">What the app already does</h2>
-          <ul className="mt-6 space-y-3 text-lg">
-            {FEATURES.map((f) => (
-              <li key={f} className="flex gap-3">
-                <Ear className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" /> {f}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="surface flex flex-col gap-4 p-8">
-          <h2 className="font-display text-3xl font-bold">Three ways to bring it in</h2>
-          <p className="text-lg"><strong>Museum station</strong> — the full exhibit with touch globe and panel.</p>
-          <p className="text-lg"><strong>Classroom kit</strong> — laptop, headphones and a printed tactile map.</p>
-          <p className="text-lg"><strong>Web app</strong> — free in any browser, with a screen reader or the built-in voice.</p>
-          <p className="flex items-center gap-2 text-base text-muted-foreground">
-            <Repeat className="h-5 w-5" aria-hidden="true" /> Data from NASA SVS / Earth Information Center.
-          </p>
-          <Button asChild size="xl" variant="hero" className="self-start">
-            <Link to="/">
-              Try the app <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
       </section>
     </div>
   );

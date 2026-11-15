@@ -34,7 +34,7 @@ const OVERVIEW = { cam: new THREE.Vector3(1.75, 1.55, 2.25), target: new THREE.V
 const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [number, number, number]; target: [number, number, number] }> = {
   globe: { label: [0.32, 1.62, -0.06], cam: [0.6, 1.4, 1.4], target: [0, 1.22, -0.06] },
   panel: { label: [0.05, 0.96, 0.46], cam: [0.15, 1.3, 1.05], target: [0, 0.82, 0.33] },
-  headphones: { label: [-0.6, 0.8, 0.1], cam: [-1.4, 1.0, 0.9], target: [-0.52, 0.62, 0.1] },
+  headphones: { label: [-0.6, 0.8, 0.1], cam: [-1.2, 1.3, 1.6], target: [-0.36, 0.85, 0.6] },
   feedback: { label: [-0.22, 1.3, 0.24], cam: [0.55, 1.4, 1.2], target: [0, 1.22, -0.06] },
   tablet: { label: [0.5, 1.26, -0.1], cam: [1.0, 1.25, 0.65], target: [0.46, 1.1, -0.14] },
 };
@@ -178,7 +178,8 @@ function ControlPanel({ state, onPress }: { state: KioskState; onPress: (a: Kios
 }
 
 /** 3 · Stereo headphones on a side hook, cabled to the station. */
-function Headphones() {
+function Headphones({ worn }: { worn: boolean }) {
+  if (worn) return <WornCable />;
   const cable = useMemo(
     () =>
       new THREE.TubeGeometry(
@@ -229,6 +230,80 @@ function Headphones() {
       <mesh geometry={cable}>
         <meshStandardMaterial color={C.rubber} roughness={0.7} />
       </mesh>
+    </group>
+  );
+}
+
+/** Cable from the station jack up to the child's head when the headphones are worn. */
+function WornCable() {
+  const cable = useMemo(() => new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.42, 0.72, 0.28), new THREE.Vector3(-0.5, 0.55, 0.45), new THREE.Vector3(-0.52, 0.6, 0.62), new THREE.Vector3(-0.47, 0.88, 0.7),
+  ]), 40, 0.006, 8), []);
+  return (
+    <group>
+      <mesh position={[-0.6 + 0.1, 0.72, 0.1]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.01, 0.01, 0.1, 12]} />
+        <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
+      </mesh>
+      <mesh geometry={cable}><meshStandardMaterial color={C.rubber} roughness={0.7} /></mesh>
+    </group>
+  );
+}
+
+/** A young visitor (about 115 cm) at the front of the station. With headphones selected, they wear them. */
+function Child({ worn }: { worn: boolean }) {
+  const skin = "#c98d6b", shirt = C.ocean, trousers = "#3a4466";
+  const head = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => { if (head.current) head.current.rotation.x = worn ? 0.25 + Math.sin(clock.elapsedTime * 1.5) * 0.03 : 0.25; });
+  return (
+    <group position={[-0.34, 0, 0.72]} rotation={[0, Math.PI + 0.35, 0]}>
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * 0.05, 0.25, 0]} castShadow>
+          <capsuleGeometry args={[0.04, 0.38, 6, 12]} />
+          <meshStandardMaterial color={trousers} roughness={0.8} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.66, 0]} castShadow>
+        <capsuleGeometry args={[0.11, 0.24, 8, 16]} />
+        <meshStandardMaterial color={shirt} roughness={0.7} />
+      </mesh>
+      {/* arms reaching forward to the globe and keys */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * 0.13, 0.74, -0.14]} rotation={[-1.2, 0, s * -0.15]} castShadow>
+          <capsuleGeometry args={[0.032, 0.26, 6, 12]} />
+          <meshStandardMaterial color={skin} roughness={0.6} />
+        </mesh>
+      ))}
+      <group ref={head} position={[0, 0.98, 0]}>
+        <mesh castShadow>
+          <sphereGeometry args={[0.1, 32, 24]} />
+          <meshStandardMaterial color={skin} roughness={0.6} />
+        </mesh>
+        <mesh position={[0, 0.03, 0.02]}>
+          <sphereGeometry args={[0.104, 32, 16, 0, Math.PI * 2, 0, 1.4]} />
+          <meshStandardMaterial color="#2b1d18" roughness={0.9} />
+        </mesh>
+        {worn && (
+          <group>
+            <mesh rotation={[0, Math.PI / 2, 0]} position={[0, 0.01, 0]}>
+              <torusGeometry args={[0.115, 0.012, 12, 48, Math.PI]} />
+              <meshStandardMaterial color={C.rubber} roughness={0.6} />
+            </mesh>
+            {[-1, 1].map((s) => (
+              <group key={s} position={[s * 0.115, -0.01, 0]}>
+                <mesh rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.045, 0.045, 0.035, 32]} />
+                  <meshStandardMaterial color={C.rubber} roughness={0.5} />
+                </mesh>
+                <mesh position={[s * 0.019, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.03, 0.03, 0.004, 32]} />
+                  <meshStandardMaterial color={s < 0 ? C.ocean : C.pink} roughness={0.4} />
+                </mesh>
+              </group>
+            ))}
+          </group>
+        )}
+      </group>
     </group>
   );
 }
@@ -438,7 +513,8 @@ export default function Station3D({
       </group>
       <Pedestal />
       <group ref={reg("panel")}><ControlPanel state={kiosk} onPress={onPress} /></group>
-      <group ref={reg("headphones")}><Headphones /></group>
+      <group ref={reg("headphones")}><Headphones worn={selected === "headphones"} /></group>
+      <Child worn={selected === "headphones"} />
       <group ref={reg("feedback")}><GlobeFeedback visible={selected === "feedback"} /></group>
       <group ref={reg("tablet")}>
         <Suspense fallback={null}>

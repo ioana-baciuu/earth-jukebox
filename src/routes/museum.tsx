@@ -115,10 +115,6 @@ function KioskBlueprint() {
         <rect x="266" y="218" width="10" height="18" rx="4" fill="currentColor" />
         <path d="M214 236 Q160 270 130 318" strokeWidth="2" />
       </g>
-      {/* height mark */}
-      <g className="fill-muted-foreground" fontSize="14">
-        <text x="40" y="310">65 cm</text>
-      </g>
       {/* Touch feedback is integrated into the globe, not a separate hand rest. */}
       {/* labels */}
       <g className="fill-foreground font-display" fontSize="22" fontWeight="700">

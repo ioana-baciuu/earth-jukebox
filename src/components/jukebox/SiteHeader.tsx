@@ -5,6 +5,7 @@ import { SettingsPanel } from "./SettingsPanel";
 const NAV = [
   { to: "/", label: "Explore" },
   { to: "/museum", label: "Museum" },
+  { to: "/business", label: "Business & Costs" },
   { to: "/your-map", label: "Your map" },
   { to: "/about", label: "How it works" },
 ] as const;

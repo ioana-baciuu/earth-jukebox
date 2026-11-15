@@ -40,80 +40,94 @@ function KioskBlueprint() {
     <svg viewBox="0 0 640 520" role="img" aria-labelledby="kiosk-t kiosk-d" className="h-auto w-full">
       <title id="kiosk-t">Earth Jukebox exhibit station drawing</title>
       <desc id="kiosk-d">
-        A child-height wooden pedestal (65 cm) holds a raised touch globe on top. In front of it is a sloped panel with four big
-        round buttons and a joystick. The headphones are cabled to the station, touch sensations are built into the globe, and a screen
-        stands beside it for teachers. A child stands at the front, touching the globe and wearing the headphones.
+        Front view matching the 3D model. A child-height wooden pedestal (65 cm) holds a raised touch globe on top. On its front edge is a
+        sloped panel with four big round buttons, a Where am I? key and a joystick. The headphones hang on a hook on the left, touch
+        sensations are built into the globe, and a small tablet sits on an arm at the right corner for teachers. A child, seen from
+        behind, stands close at the front wearing the headphones, one hand on the globe and one on the buttons.
       </desc>
       <g fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted-foreground" strokeLinejoin="round">
         {/* floor */}
         <line x1="40" y1="480" x2="600" y2="480" strokeDasharray="6 8" />
-        {/* screen */}
-        <rect x="430" y="70" width="160" height="110" rx="10" />
-        <line x1="510" y1="180" x2="510" y2="300" />
-        {/* pedestal */}
-        <path d="M150 347 L490 347 L470 480 L170 480 Z" />
-        <path d="M130 300 L510 300 L490 347 L150 347 Z" />
+        {/* tablet arm at the right corner */}
+        <line x1="472" y1="296" x2="472" y2="232" />
+        {/* pedestal body, top slab and toe rail */}
+        <rect x="150" y="312" width="340" height="168" rx="8" className="fill-secondary/40" />
+        <rect x="136" y="298" width="368" height="16" rx="5" />
+        <line x1="160" y1="470" x2="480" y2="470" />
       </g>
-      {/* screen content */}
-      <rect x="442" y="82" width="136" height="86" rx="6" className="fill-secondary" />
-      <circle cx="510" cy="125" r="28" className="fill-primary/40" />
-      {/* globe */}
+      {/* name plate */}
+      <rect x="230" y="392" width="180" height="44" rx="4" className="fill-secondary" />
+      <text x="320" y="420" textAnchor="middle" fontSize="15" fontWeight="700" className="fill-primary font-display">EARTH JUKEBOX</text>
+      {/* sloped control panel on the front edge */}
+      <path d="M170 306 L470 306 L478 340 L162 340 Z" className="fill-secondary" stroke="currentColor" strokeWidth="2" />
+      {/* tablet */}
+      <g className="text-muted-foreground">
+        <rect x="420" y="168" width="104" height="64" rx="7" fill="none" stroke="currentColor" strokeWidth="2.5" />
+        <rect x="428" y="176" width="88" height="48" rx="4" className="fill-secondary" />
+        <circle cx="472" cy="200" r="14" className="fill-primary/40" />
+      </g>
+      {/* globe on its cradle */}
       <g className="text-primary">
-        <circle cx="330" cy="238" r="62" fill="none" stroke="currentColor" strokeWidth="4" />
-        <ellipse cx="330" cy="238" rx="62" ry="21" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
-        <ellipse cx="330" cy="238" rx="26" ry="62" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
-        <path d="M295 212 q13 -16 29 -7 q10 13 -3 26 q-16 7 -26 -19Z M337 238 q20 -10 29 7 q-3 23 -20 26 q-13 -13 -9 -33Z" fill="currentColor" opacity="0.55" />
-        <path d="M305 298 L355 298 L362 304 L298 304 Z" fill="currentColor" />
+        <circle cx="320" cy="236" r="62" fill="none" stroke="currentColor" strokeWidth="4" />
+        <ellipse cx="320" cy="236" rx="62" ry="21" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+        <ellipse cx="320" cy="236" rx="26" ry="62" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+        <path d="M285 210 q13 -16 29 -7 q10 13 -3 26 q-16 7 -26 -19Z M327 236 q20 -10 29 7 q-3 23 -20 26 q-13 -13 -9 -33Z" fill="currentColor" opacity="0.55" />
+        <path d="M296 296 L344 296 L350 302 L290 302 Z" fill="currentColor" />
       </g>
       {/* buttons */}
       {[
         ["layer-ocean", 200],
-        ["layer-storm", 255],
-        ["layer-forest", 310],
-        ["layer-lights", 365],
+        ["layer-storm", 248],
+        ["layer-forest", 296],
+        ["layer-lights", 344],
       ].map(([cls, x]) => (
         <g key={cls} className={String(cls)}>
-          <circle cx={Number(x)} cy="323" r="16" className="fill-[var(--layer)]" />
+          <circle cx={Number(x)} cy="323" r="14" className="fill-[var(--layer)]" />
         </g>
       ))}
       {/* Where am I? key */}
-      <rect x="395" y="313" width="34" height="20" rx="5" className="fill-primary" />
+      <rect x="374" y="314" width="30" height="18" rx="5" className="fill-primary" />
       {/* joystick in an east/west slot */}
-      <rect x="440" y="318" width="50" height="10" rx="5" className="fill-secondary" />
-      <line x1="465" y1="323" x2="465" y2="302" stroke="currentColor" strokeWidth="4" className="text-foreground" />
-      <circle cx="465" cy="300" r="8" className="fill-primary" />
-      {/* child visitor, reaching the globe, wearing the headphones */}
-      <g className="text-foreground" fill="currentColor">
-        <circle cx="585" cy="268" r="24" />
-        <path d="M565 300 q20 -10 40 0 l8 110 h-56 Z" />
-        <rect x="565" y="405" width="14" height="75" rx="6" />
-        <rect x="591" y="405" width="14" height="75" rx="6" />
-        <path d="M568 310 Q470 290 392 250" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
+      <rect x="414" y="319" width="46" height="9" rx="4.5" className="fill-background" />
+      <line x1="437" y1="323" x2="437" y2="304" stroke="currentColor" strokeWidth="4" className="text-foreground" />
+      <circle cx="437" cy="302" r="7" className="fill-primary" />
+      {/* headphone hook on the left side */}
+      <g fill="none" stroke="currentColor" strokeWidth="5" className="text-foreground" strokeLinecap="round">
+        <line x1="104" y1="318" x2="148" y2="318" />
+        <path d="M104 318 v14" />
+      </g>
+      {/* child visitor seen from behind, standing close, wearing the headphones */}
+      <g className="text-foreground" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round">
+        {/* legs */}
+        <rect x="222" y="372" width="18" height="108" rx="8" fill="currentColor" fillOpacity="0.35" />
+        <rect x="248" y="372" width="18" height="108" rx="8" fill="currentColor" fillOpacity="0.35" />
+        {/* body */}
+        <path d="M214 258 q30 -14 60 0 l6 120 h-72 Z" fill="currentColor" fillOpacity="0.35" />
+        {/* short arms: right hand on the globe, left hand on the buttons */}
+        <path d="M268 262 L292 282" fill="none" strokeWidth="13" strokeOpacity="0.85" />
+        <path d="M220 264 L228 308" fill="none" strokeWidth="13" strokeOpacity="0.85" />
+        {/* head */}
+        <circle cx="244" cy="226" r="24" fill="currentColor" fillOpacity="0.35" />
       </g>
       <g fill="none" stroke="currentColor" strokeWidth="4" className="text-primary" strokeLinecap="round">
-        <path d="M560 262 a26 26 0 0 1 50 0" />
-        <rect x="555" y="258" width="10" height="18" rx="4" fill="currentColor" />
-        <path d="M560 276 Q540 360 495 340" strokeWidth="2" />
+        <path d="M218 224 a26 26 0 0 1 52 0" />
+        <rect x="212" y="218" width="10" height="18" rx="4" fill="currentColor" />
+        <rect x="266" y="218" width="10" height="18" rx="4" fill="currentColor" />
+        <path d="M214 236 Q160 270 130 318" strokeWidth="2" />
       </g>
-      {/* headphones */}
-      <g fill="none" stroke="currentColor" strokeWidth="5" className="text-foreground" strokeLinecap="round">
-        <path d="M105 330 v20" />
-        <line x1="105" y1="330" x2="150" y2="330" />
-      </g>
-      {/* height marks */}
+      {/* height mark */}
       <g className="fill-muted-foreground" fontSize="14">
-        <text x="40" y="352">65 cm</text>
-        <text x="420" y="243">globe 96 cm</text>
+        <text x="40" y="310">65 cm</text>
       </g>
       {/* Touch feedback is integrated into the globe, not a separate hand rest. */}
       {/* labels */}
       <g className="fill-foreground font-display" fontSize="22" fontWeight="700">
         {[
-          [1, 250, 170],
-          [2, 175, 280],
-          [3, 540, 240],
-           [4, 365, 225],
-          [5, 600, 60],
+          [1, 400, 160],
+          [2, 520, 330],
+          [3, 100, 280],
+          [4, 362, 214],
+          [5, 560, 160],
         ].map(([n, x, y]) => (
           <g key={n}>
             <circle cx={x} cy={y} r="16" className="fill-primary" />

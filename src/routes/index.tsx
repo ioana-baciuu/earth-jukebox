@@ -137,8 +137,9 @@ function Index() {
       const snap = createUmweltSnapshot(base.lat, base.lng, describePlace(base.lat, base.lng, s0.land > 0.5), spec.id, layerStrength(layer, s0));
       const eng = await getEngine();
       eng.marimba(snap.audioSynthParams.frequency, 0.4, longitudeToPan(base.lng));
-      setCaption(snap.ariaLiveCaption);
-      speak(snap.ariaLiveCaption, { force: true });
+      const text = spec.id === "ocean" && s0.land > 0.5 ? `${snap.target.name}. On land, no sea here. ${formatCoords(base.lat, base.lng)}.` : snap.ariaLiveCaption;
+      setCaption(text);
+      speak(text, { force: true });
       return;
     }
     else if (e.key === "Enter" || e.key === " ") {
@@ -166,7 +167,7 @@ function Index() {
       buzz(crossing === "to-land" ? [40, 30, 80] : [120]);
     }
     const spec = erieFor(layer);
-    if (spec) setCaption(createUmweltSnapshot(lat, lng, describePlace(lat, lng, s.land > 0.5), spec.id, v).ariaLiveCaption);
+    if (spec && !(spec.id === "ocean" && s.land > 0.5)) setCaption(createUmweltSnapshot(lat, lng, describePlace(lat, lng, s.land > 0.5), spec.id, v).ariaLiveCaption);
     if (announceTimer.current) clearTimeout(announceTimer.current);
     announceTimer.current = setTimeout(() => {
       announce(`${crossing === "to-land" ? "Land ahead! " : crossing === "to-water" ? "Splash, into the sea. " : ""}${describePlace(lat, lng, s.land > 0.5)}. ${LAYERS[layer].name}: ${levelWord(layer, s)}.`);

@@ -7,6 +7,7 @@ const NAV = [
   { to: "/museum", label: "Museum" },
   { to: "/your-map", label: "Your map" },
   { to: "/about", label: "How it works" },
+  { to: "/slides", label: "Presentation" },
 ] as const;
 
 export function SiteHeader() {

@@ -1,5 +1,5 @@
 # Earth Jukebox roadmap
-- [ ] Build and verify the seven-slide, three-minute themed jury presentation with QR, live links, notes and PDF printing
+- [x] Build and verify the seven-slide, three-minute themed jury presentation with QR, live links, notes and PDF printing
 - [x] Remove the rear globe bar and attach the headphone cable
 - [x] Replace the starter README with project setup, NASA extraction and museum demonstration documentation
 - [x] Remove the prototype outline, place the support behind the globe, and integrate touch feedback into the globe

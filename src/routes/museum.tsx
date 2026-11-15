@@ -1,3 +1,4 @@
+import { STATION_SPECS } from "@/lib/station-parts";
 import { createFileRoute } from "@tanstack/react-router";
 import { Hand, Headphones, Keyboard, Monitor, School, Vibrate } from "lucide-react";
 import { MuseumSimulator } from "@/components/jukebox/MuseumSimulator";
@@ -39,7 +40,7 @@ function KioskBlueprint() {
     <svg viewBox="0 0 640 520" role="img" aria-labelledby="kiosk-t kiosk-d" className="h-auto w-full">
       <title id="kiosk-t">Earth Jukebox exhibit station drawing</title>
       <desc id="kiosk-d">
-        A waist-high wooden pedestal holds a raised touch globe on top. In front of it is a sloped panel with four big
+        A child-height wooden pedestal (65 cm) holds a raised touch globe on top. In front of it is a sloped panel with four big
         round buttons and a joystick. The headphones are cabled to the station, touch sensations are built into the globe, and a screen
         stands beside it for teachers. A child stands at the front, touching the globe and wearing the headphones.
       </desc>
@@ -48,21 +49,21 @@ function KioskBlueprint() {
         <line x1="40" y1="480" x2="600" y2="480" strokeDasharray="6 8" />
         {/* screen */}
         <rect x="430" y="70" width="160" height="110" rx="10" />
-        <line x1="510" y1="180" x2="510" y2="250" />
+        <line x1="510" y1="180" x2="510" y2="300" />
         {/* pedestal */}
-        <path d="M150 300 L490 300 L470 480 L170 480 Z" />
-        <path d="M130 250 L510 250 L490 300 L150 300 Z" />
+        <path d="M150 347 L490 347 L470 480 L170 480 Z" />
+        <path d="M130 300 L510 300 L490 347 L150 347 Z" />
       </g>
       {/* screen content */}
       <rect x="442" y="82" width="136" height="86" rx="6" className="fill-secondary" />
       <circle cx="510" cy="125" r="28" className="fill-primary/40" />
       {/* globe */}
       <g className="text-primary">
-        <circle cx="320" cy="150" r="95" fill="none" stroke="currentColor" strokeWidth="4" />
-        <ellipse cx="320" cy="150" rx="95" ry="32" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
-        <ellipse cx="320" cy="150" rx="40" ry="95" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
-        <path d="M265 110 q20 -25 45 -10 q15 20 -5 40 q-25 10 -40 -30Z M330 150 q30 -15 45 10 q-5 35 -30 40 q-20 -20 -15 -50Z" fill="currentColor" opacity="0.55" />
-        <path d="M290 245 L350 245 L360 255 L280 255 Z" fill="currentColor" />
+        <circle cx="330" cy="238" r="62" fill="none" stroke="currentColor" strokeWidth="4" />
+        <ellipse cx="330" cy="238" rx="62" ry="21" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+        <ellipse cx="330" cy="238" rx="26" ry="62" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+        <path d="M295 212 q13 -16 29 -7 q10 13 -3 26 q-16 7 -26 -19Z M337 238 q20 -10 29 7 q-3 23 -20 26 q-13 -13 -9 -33Z" fill="currentColor" opacity="0.55" />
+        <path d="M305 298 L355 298 L362 304 L298 304 Z" fill="currentColor" />
       </g>
       {/* buttons */}
       {[
@@ -72,41 +73,46 @@ function KioskBlueprint() {
         ["layer-lights", 365],
       ].map(([cls, x]) => (
         <g key={cls} className={String(cls)}>
-          <circle cx={Number(x)} cy="275" r="18" className="fill-[var(--layer)]" />
+          <circle cx={Number(x)} cy="323" r="16" className="fill-[var(--layer)]" />
         </g>
       ))}
       {/* Where am I? key */}
-      <rect x="395" y="264" width="34" height="22" rx="5" className="fill-primary" />
+      <rect x="395" y="313" width="34" height="20" rx="5" className="fill-primary" />
       {/* joystick in an east/west slot */}
-      <rect x="440" y="270" width="50" height="10" rx="5" className="fill-secondary" />
-      <line x1="465" y1="275" x2="465" y2="252" stroke="currentColor" strokeWidth="4" className="text-foreground" />
-      <circle cx="465" cy="250" r="8" className="fill-primary" />
+      <rect x="440" y="318" width="50" height="10" rx="5" className="fill-secondary" />
+      <line x1="465" y1="323" x2="465" y2="302" stroke="currentColor" strokeWidth="4" className="text-foreground" />
+      <circle cx="465" cy="300" r="8" className="fill-primary" />
       {/* child visitor, reaching the globe, wearing the headphones */}
       <g className="text-foreground" fill="currentColor">
         <circle cx="585" cy="268" r="24" />
         <path d="M565 300 q20 -10 40 0 l8 110 h-56 Z" />
         <rect x="565" y="405" width="14" height="75" rx="6" />
         <rect x="591" y="405" width="14" height="75" rx="6" />
-        <path d="M568 310 Q520 300 470 255" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
+        <path d="M568 310 Q470 290 392 250" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
       </g>
       <g fill="none" stroke="currentColor" strokeWidth="4" className="text-primary" strokeLinecap="round">
         <path d="M560 262 a26 26 0 0 1 50 0" />
         <rect x="555" y="258" width="10" height="18" rx="4" fill="currentColor" />
-        <path d="M560 276 Q540 330 495 300" strokeWidth="2" />
+        <path d="M560 276 Q540 360 495 340" strokeWidth="2" />
       </g>
       {/* headphones */}
       <g fill="none" stroke="currentColor" strokeWidth="5" className="text-foreground" strokeLinecap="round">
-        <path d="M105 285 v20" />
-        <line x1="105" y1="285" x2="150" y2="285" />
+        <path d="M105 330 v20" />
+        <line x1="105" y1="330" x2="150" y2="330" />
+      </g>
+      {/* height marks */}
+      <g className="fill-muted-foreground" fontSize="14">
+        <text x="40" y="352">65 cm</text>
+        <text x="420" y="243">globe 96 cm</text>
       </g>
       {/* Touch feedback is integrated into the globe, not a separate hand rest. */}
       {/* labels */}
       <g className="fill-foreground font-display" fontSize="22" fontWeight="700">
         {[
-          [1, 205, 70],
-          [2, 320, 225],
+          [1, 250, 170],
+          [2, 175, 280],
           [3, 540, 240],
-           [4, 375, 150],
+           [4, 365, 225],
           [5, 600, 60],
         ].map(([n, x, y]) => (
           <g key={n}>
@@ -177,6 +183,15 @@ function MuseumPage() {
             The station
           </h2>
           <KioskBlueprint />
+          <dl className="mt-4 grid gap-2 border-t border-border pt-4 text-sm">
+            {STATION_SPECS.map(([k, v]) => (
+              <div key={k} className="grid grid-cols-[7rem_1fr] gap-2">
+                <dt className="font-bold">{k}</dt>
+                <dd className="text-muted-foreground">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-3 text-xs text-muted-foreground">Proposed specification for the hackathon prototype; final sizes follow accessibility testing with partner museums.</p>
         </div>
         <ol className="space-y-4">
           {PARTS.map((p) => (

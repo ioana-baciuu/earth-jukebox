@@ -14,14 +14,6 @@ const Station3D = lazy(() => import("./Station3D"));
 const ACTION_LABEL: Record<KioskAction, string> = { ocean: "Sea Temperature key", storm: "Lightning key", forest: "Forest Height key", lights: "Night Lights key", where: "Where am I?", west: "Joystick west", east: "Joystick east" };
 const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard, headphones: Headphones, feedback: Vibrate, tablet: Monitor };
 
-const SPECS = [
-  ["Footprint", "118 × 70 cm, fits a 150 cm wheelchair turning circle beside it"],
-  ["Panel height", "90 cm front edge, sloped 18° toward the child"],
-  ["Globe", "60 cm tactile relief, 128 touch zones, north fixed upright"],
-  ["Audio", "Two stereo headphone ports with volume limit"],
-  ["Power", "One standard socket; runs offline from a built-in computer"],
-  ["Materials", "Birch plywood, wipe-clean resin globe, rubber Braille keys"],
-];
 
 export function StationShowcase() {
   const { settings, announce } = useA11y();
@@ -120,15 +112,6 @@ export function StationShowcase() {
             })}
             <Button variant="ghost" onClick={() => select(null)} className="justify-start"><RotateCcw aria-hidden="true" /> Whole station</Button>
           </div>
-          <dl className="surface grid gap-2 p-4 text-sm">
-            {SPECS.map(([k, v]) => (
-              <div key={k} className="grid grid-cols-[7rem_1fr] gap-2">
-                <dt className="font-bold">{k}</dt>
-                <dd className="text-muted-foreground">{v}</dd>
-              </div>
-            ))}
-            <p className="mt-1 text-xs text-muted-foreground">Proposed specification for the hackathon prototype; final sizes follow accessibility testing with partner museums.</p>
-          </dl>
         </div>
       </div>
     </section>

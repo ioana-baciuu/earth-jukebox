@@ -30,13 +30,13 @@ const C = {
   cream: "#efe8dd",
 };
 
-const OVERVIEW = { cam: new THREE.Vector3(1.75, 1.55, 2.25), target: new THREE.Vector3(0, 0.85, 0) };
+const OVERVIEW = { cam: new THREE.Vector3(1.75, 1.55, 2.25), target: new THREE.Vector3(0, 0.7, 0) };
 const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [number, number, number]; target: [number, number, number] }> = {
-  globe: { label: [0.32, 1.62, -0.06], cam: [0.6, 1.4, 1.4], target: [0, 1.22, -0.06] },
-  panel: { label: [0.05, 0.96, 0.46], cam: [0.15, 1.3, 1.05], target: [0, 0.82, 0.33] },
-  headphones: { label: [-0.6, 0.8, 0.1], cam: [-1.2, 1.3, 1.6], target: [-0.36, 0.85, 0.6] },
-  feedback: { label: [-0.22, 1.3, 0.24], cam: [0.55, 1.4, 1.2], target: [0, 1.22, -0.06] },
-  tablet: { label: [0.5, 1.26, -0.1], cam: [1.0, 1.25, 0.65], target: [0.46, 1.1, -0.14] },
+  globe: { label: [0.32, 1.44, 0.04], cam: [0.6, 1.25, 1.4], target: [0, 1.04, 0.04] },
+  panel: { label: [0.05, 0.76, 0.46], cam: [0.15, 1.1, 1.05], target: [0, 0.62, 0.33] },
+  headphones: { label: [-0.6, 0.6, 0.1], cam: [-1.2, 1.2, 1.6], target: [-0.3, 0.8, 0.55] },
+  feedback: { label: [-0.22, 1.12, 0.34], cam: [0.55, 1.25, 1.2], target: [0, 1.04, 0.04] },
+  tablet: { label: [0.5, 1.06, -0.1], cam: [1.0, 1.05, 0.65], target: [0.46, 0.9, -0.14] },
 };
 
 function useCanvasTexture(draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void, w = 512, h = 512) {
@@ -85,7 +85,7 @@ function TouchGlobe({ spin, lng }: { spin: boolean; lng: number }) {
     r.y = spin ? r.y + (goal - r.y) * (1 - Math.exp(-5 * Math.min(dt, 0.05))) : goal;
   });
   return (
-    <group position={[0, 1.24, -0.06]}>
+    <group position={[0, 1.24, 0.04]}>
       <mesh ref={earth} castShadow>
         <sphereGeometry args={[0.36, 96, 64]} />
         <meshStandardMaterial map={map} bumpMap={bumpMap} bumpScale={6} roughness={0.75} metalness={0.02} />
@@ -237,7 +237,7 @@ function Headphones({ worn }: { worn: boolean }) {
 /** Cable from the station jack up to the child's head when the headphones are worn. */
 function WornCable() {
   const cable = useMemo(() => new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.42, 0.72, 0.28), new THREE.Vector3(-0.5, 0.55, 0.45), new THREE.Vector3(-0.52, 0.6, 0.62), new THREE.Vector3(-0.3, 0.95, 0.74),
+    new THREE.Vector3(-0.42, 0.72, 0.28), new THREE.Vector3(-0.5, 0.6, 0.45), new THREE.Vector3(-0.45, 0.85, 0.62), new THREE.Vector3(-0.27, 1.16, 0.6),
   ]), 40, 0.006, 8), []);
   return (
     <group>
@@ -256,7 +256,7 @@ function Child({ worn }: { worn: boolean }) {
   const head = useRef<THREE.Group>(null);
   useFrame(({ clock }) => { if (head.current) head.current.rotation.x = worn ? 0.25 + Math.sin(clock.elapsedTime * 1.5) * 0.03 : 0.25; });
   return (
-    <group position={[-0.22, 0, 0.74]} rotation={[0, -0.35, 0]}>
+    <group position={[-0.18, 0, 0.64]} rotation={[0, -0.3, 0]}>
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * 0.05, 0.25, 0]} castShadow>
           <capsuleGeometry args={[0.04, 0.38, 6, 12]} />
@@ -269,7 +269,7 @@ function Child({ worn }: { worn: boolean }) {
       </mesh>
       {/* arms reaching forward to the globe and keys */}
       {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 0.13, 0.74, -0.14]} rotation={[-1.2, 0, s * -0.15]} castShadow>
+        <mesh key={s} position={[s * 0.12, 0.8, -0.16]} rotation={[-1.35, 0, s * -0.2]} castShadow>
           <capsuleGeometry args={[0.032, 0.26, 6, 12]} />
           <meshStandardMaterial color={skin} roughness={0.6} />
         </mesh>
@@ -311,7 +311,7 @@ function Child({ worn }: { worn: boolean }) {
 /** 4 · Concept overlay for actuators beneath the globe's touch surface. */
 function GlobeFeedback({ visible }: { visible: boolean }) {
   return (
-    <group position={[0, 1.24, -0.06]} visible={visible}>
+    <group position={[0, 1.24, 0.04]} visible={visible}>
       {[C.ocean, C.pink, C.storm].map((color, index) => (
         <mesh key={color} rotation={[0, -0.8 + index * 0.7, 0]}>
           <sphereGeometry args={[0.363, 32, 20, 0.15, 0.55, 1.1, 0.65]} />
@@ -389,17 +389,17 @@ function Pedestal() {
   }, 640, 170);
   return (
     <group>
-      <RoundedBox args={[0.9, 0.72, 0.56]} radius={0.03} smoothness={4} position={[0, 0.4, 0]} castShadow receiveShadow>
+      <RoundedBox args={[0.9, 0.52, 0.56]} radius={0.03} smoothness={4} position={[0, 0.5, 0]} castShadow receiveShadow>
         <meshStandardMaterial map={wood} roughness={0.7} />
       </RoundedBox>
       <RoundedBox args={[0.96, 0.06, 0.62]} radius={0.02} smoothness={3} position={[0, 0.79, 0]} castShadow>
         <meshStandardMaterial color={C.cream} roughness={0.5} />
       </RoundedBox>
-      <mesh position={[0, 0.02, 0]}>
+      <mesh position={[0, 0.22, 0]}>
         <boxGeometry args={[0.82, 0.04, 0.48]} />
         <meshStandardMaterial color={C.rubber} roughness={0.9} />
       </mesh>
-      <mesh position={[0, 0.45, 0.282]}>
+      <mesh position={[0, 0.5, 0.282]}>
         <planeGeometry args={[0.7, 0.185]} />
         <meshStandardMaterial map={plate} roughness={0.4} />
       </mesh>
@@ -506,6 +506,8 @@ export default function Station3D({
         <Lightformer intensity={1.2} color={C.pink} position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
         <Lightformer intensity={1} color={C.ocean} position={[5, 1, 1]} rotation-y={-Math.PI / 2} scale={[20, 1, 1]} />
       </Environment>
+      {/* Station lowered 20 cm so a child reaches the globe; the child stays at floor level. */}
+      <group position={[0, -0.2, 0]}>
       <group ref={reg("globe")}>
         <Suspense fallback={null}>
           <TouchGlobe spin={spin} lng={kiosk.lng} />
@@ -514,7 +516,6 @@ export default function Station3D({
       <Pedestal />
       <group ref={reg("panel")}><ControlPanel state={kiosk} onPress={onPress} /></group>
       <group ref={reg("headphones")}><Headphones worn={selected === "headphones"} /></group>
-      <Child worn={selected === "headphones"} />
       <group ref={reg("feedback")}><GlobeFeedback visible={selected === "feedback"} /></group>
       <group ref={reg("tablet")}>
         <Suspense fallback={null}>
@@ -522,6 +523,8 @@ export default function Station3D({
           <ReadyFlag onReady={onReady} />
         </Suspense>
       </group>
+      </group>
+      <Child worn={selected === "headphones"} />
       <ContactShadows position={[0, 0, 0]} opacity={0.55} scale={4} blur={2.4} far={1.5} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.002, 0]}>
         <circleGeometry args={[2.2, 64]} />

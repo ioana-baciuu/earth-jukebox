@@ -42,6 +42,12 @@ export function dayPhase(lat: number, lng: number, sun: { lat: number; lng: numb
 export function nightShare(lat: number, lng: number, sun: { lat: number; lng: number }) {
   return Math.round(((1 - sunCosine(lat, lng, sun)) / 2) * 100);
 }
+const CHILD_LINE: Record<MuseumLayer, (w: string) => string> = {
+  ocean: w => `Sea temperature here: ${w}. Listen to the waves.`,
+  storm: w => `Lightning here: ${w}. Listen for the thunder.`,
+  forest: w => `Forest here: ${w}. Listen to the birds in the trees.`,
+  lights: w => `City lights here: ${w}. Listen to the bells of the night.`,
+};
 export function museumSnapshot(layer: MuseumLayer, lat: number, lng: number, value?: number) {
   const sample = sampleEarth(lat, lng);
   if (value !== undefined) sample[layer] = Math.max(0, Math.min(1, value));
@@ -50,5 +56,5 @@ export function museumSnapshot(layer: MuseumLayer, lat: number, lng: number, val
   const word = layer === "ocean" && sample.land > 0.6 ? "No sea here" : LAYERS[layer].levels[levelIndex(amount)];
   return { lat, lng, sample, amount, name, word, pitch: latitudeToFreq(lat), pan: longitudeToPan(lng),
     thermal: layer !== "ocean" || sample.land > 0.6 ? "Neutral" : amount < 0.38 ? "Cool" : amount > 0.62 ? "Warm" : "Mild",
-    caption: `${name}. ${LAYERS[layer].name}: ${word}. Illustrative NASA image-based value.` };
+    caption: `You touched ${name}. ${CHILD_LINE[layer](word)}` };
 }

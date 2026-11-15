@@ -38,7 +38,7 @@ export function MuseumSimulator() {
     const request=++generation.current;
     const e=await getEngine(); if(request!==generation.current)return;
     e.setVolume(settings.volume); e.setSample(next.sample);
-    e.setMix(orchestra ? Object.fromEntries(MUSEUM_LAYERS.map(id=>[id,0.55])) : {[layer]:0.8});
+    e.setMix(orchestra ? Object.fromEntries(MUSEUM_LAYERS.map(id=>[id,0.55])) : {[layer]:0.15+0.85*next.amount});
     e.marimba(next.pitch,0.12,next.pan);setListening(true);
     if(narrate){speak(next.caption);announce(next.caption);}
   },[layer,orchestra,settings.volume,speak,announce]);
@@ -55,7 +55,7 @@ export function MuseumSimulator() {
   },[probe]);
   const choose=(id:MuseumLayer)=>{generation.current++;setLayer(id);setValue(undefined);setListening(false);peekEngine()?.stopAll(0.2);announce(`${LAYERS[id].name} selected.`);};
   const stop=()=>{generation.current++;setListening(false);peekEngine()?.stopAll(0.2);stopSpeaking();announce("Sound stopped.");};
-  useEffect(()=>{ if(!listening)return;const e=peekEngine();e?.setSample(state.sample);e?.setMix(orchestra?Object.fromEntries(MUSEUM_LAYERS.map(id=>[id,0.55])):{[layer]:0.8}); },[state,listening,layer,orchestra]);
+  useEffect(()=>{ if(!listening)return;const e=peekEngine();e?.setSample(state.sample);e?.setMix(orchestra?Object.fromEntries(MUSEUM_LAYERS.map(id=>[id,0.55])):{[layer]:0.15+0.85*state.amount}); },[state,listening,layer,orchestra]);
   const moveRef=useRef(move);moveRef.current=move;
   useEffect(()=>{let last=0;const timer=setInterval(()=>{
     const pad=Array.from(navigator.getGamepads?.()??[]).find(Boolean);setController(Boolean(pad));

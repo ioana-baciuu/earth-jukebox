@@ -19,6 +19,9 @@ import { ContrastStories } from "@/components/jukebox/ContrastStories";
 import { cn } from "@/lib/utils";
 import { createUmweltSnapshot, ERIE_SPECS, erieFor } from "@/lib/sonification-spec";
 import { EvaluationForm } from "@/components/jukebox/EvaluationForm";
+import { lazy, Suspense } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+const ParticleEarth = lazy(() => import("@/components/jukebox/particle/ParticleEarth"));
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -257,6 +260,7 @@ function Index() {
     setMode(m);
   };
 
+  const [view, setView] = useState<"photo" | "particles">("photo");
   const skin = mode === "orchestra" ? skinDay.url : LAYERS[layer].skin;
   const ringLayer = mode === "orchestra" ? "base" : layer;
   const globeLabel = `Earth globe showing ${mode === "orchestra" ? "the whole planet" : LAYERS[layer].name}. Use arrow keys to travel and Enter to listen.${
@@ -270,7 +274,20 @@ function Index() {
         <div className="lg:order-2">
           <div className="lg:sticky lg:top-24">
             <div className="globe-stage relative mx-auto aspect-square w-full max-w-[44rem]">
-              <EarthGlobe
+{view === "particles" ? (
+                <ClientOnly fallback={null}>
+                  <Suspense fallback={null}>
+                    <ParticleEarth
+                      layer={ringLayer}
+                      cursor={cursor}
+                      calmMotion={settings.calmMotion}
+                      label={globeLabel}
+                      onPick={pickOnGlobe}
+                    />
+                  </Suspense>
+                </ClientOnly>
+              ) : (
+                            <EarthGlobe
                 ref={globe}
                 skinUrl={skin}
                 layer={ringLayer}
@@ -281,6 +298,20 @@ function Index() {
                 onPick={pickOnGlobe}
                 onKeyDown={onGlobeKey}
               />
+              )}
+              <div className="absolute right-3 top-3 z-10 flex rounded-full bg-background/80 p-1 text-sm font-bold" role="group" aria-label="Globe look">
+                {(["photo", "particles"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    aria-pressed={view === v}
+                    onClick={() => setView(v)}
+                    className={cn("rounded-full px-3 py-1.5", view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
+                  >
+                    {v === "photo" ? "Real Earth" : "Particle Earth"}
+                  </button>
+                ))}
+              </div>
               <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-base font-bold text-muted-foreground">
                 <span className="rounded-full bg-background/80 px-4 py-2">
                   {mode === "orchestra" ? "Tap the globe to choose where the journey goes" : "Tap anywhere on Earth to listen"}

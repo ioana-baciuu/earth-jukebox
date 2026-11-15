@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as MuseumRouteImport } from './routes/museum'
 import { Route as YourMapRouteImport } from './routes/your-map'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MuseumRoute = MuseumRouteImport.update({
@@ -38,12 +44,14 @@ const YourMapRoute = YourMapRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/business': typeof BusinessRoute
   '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/business': typeof BusinessRoute
   '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/business': typeof BusinessRoute
   '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/museum' | '/your-map'
+  fullPaths: '/' | '/about' | '/business' | '/museum' | '/your-map'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/museum' | '/your-map'
-  id: '__root__' | '/' | '/about' | '/museum' | '/your-map'
+  to: '/' | '/about' | '/business' | '/museum' | '/your-map'
+  id: '__root__' | '/' | '/about' | '/business' | '/museum' | '/your-map'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BusinessRoute: typeof BusinessRoute
   MuseumRoute: typeof MuseumRoute
   YourMapRoute: typeof YourMapRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/museum': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BusinessRoute: BusinessRoute,
   MuseumRoute: MuseumRoute,
   YourMapRoute: YourMapRoute,
 }

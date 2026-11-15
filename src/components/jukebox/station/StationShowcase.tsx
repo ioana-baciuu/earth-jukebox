@@ -35,22 +35,30 @@ export function StationShowcase() {
       const label = ACTION_LABEL[a].toUpperCase();
       const snap = museumSnapshot(layer, k.lat, lng);
       const msg = a === "where" ? `You are at ${snap.name}. ${LAYERS[layer].name} is selected. ${snap.caption.split('. ').slice(1).join('. ')}` : `${ACTION_LABEL[a]}. ${a === "west" || a === "east" ? snap.name : LAYERS[layer].name}.`;
+      void playAt(layer, k.lat, lng, a === "west" || a === "east");
       speak(msg); announce(msg); say(msg);
       setKiosk({ layer, lat: k.lat, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 });
     }
   };
-  const touch = async (lat: number, lng: number) => {
+  /** Start the chosen dataset's sound at a place; louder where the NASA value is higher. */
+  const playAt = async (layer: MuseumLayer, lat: number, lng: number, coast = true) => {
+    try {
+      const snap = museumSnapshot(layer, lat, lng);
+      const e = await getEngine();
+      const crossing = !coast || lastLand.current === null ? null : coastCrossing(lastLand.current, snap.sample.land);
+      lastLand.current = snap.sample.land;
+      e.setVolume(settings.volume || 0.85); e.setSample(snap.sample);
+      e.setMix({ [layer]: 0.35 + 0.65 * snap.amount }, 0.3);
+      e.marimba(snap.pitch, 0.25, snap.pan);
+      if (crossing) { e.coast(crossing === "to-land", snap.pan); buzz(crossing === "to-land" ? [40, 30, 80] : [100]); }
+    } catch (err) { console.error("Sound failed", err); }
+  };
+  const touch = (lat: number, lng: number) => {
     const snap = museumSnapshot(kiosk.layer, lat, lng);
+    void playAt(kiosk.layer, lat, lng);
     setTouched(snap.caption);
     setKiosk((k) => ({ ...k, lat, lng, lastAction: "TOUCHED GLOBE", pressed: null, pressedAt: performance.now(), tilt: 0 }));
     speak(snap.caption); announce(snap.caption); say(snap.caption);
-    const e = await getEngine();
-    const crossing = lastLand.current === null ? null : coastCrossing(lastLand.current, snap.sample.land);
-    lastLand.current = snap.sample.land;
-    e.setVolume(settings.volume); e.setSample(snap.sample);
-    e.setMix({ [kiosk.layer]: 0.15 + 0.85 * snap.amount });
-    e.marimba(snap.pitch, 0.12, snap.pan);
-    if (crossing) { e.coast(crossing === "to-land", snap.pan); buzz(crossing === "to-land" ? [40, 30, 80] : [100]); }
   };
   const select = (id: StationPartId | null) => {
     setSelected(id);
@@ -96,7 +104,7 @@ export function StationShowcase() {
                 tabIndex={-1}
                 aria-label={p.title}
                 aria-pressed={selected === p.id}
-                className="station-hotspot pointer-events-auto absolute left-0 top-0"
+                className={`station-hotspot absolute left-0 top-0 ${p.id === "globe" ? "pointer-events-none opacity-60" : "pointer-events-auto"}`}
                 onClick={() => select(selected === p.id ? null : p.id)}
               >{p.n}</Button>
             ))}

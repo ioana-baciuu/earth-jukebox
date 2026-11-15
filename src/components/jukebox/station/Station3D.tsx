@@ -73,7 +73,7 @@ function useWood() {
 }
 
 /** 1 · Tactile touch globe with real NASA skin and relief bump, seated on its cradle. */
-function TouchGlobe({ spin, lng, onTouch }: { spin: boolean; lng: number; onTouch?: (lat: number, lng: number) => void }) {
+function TouchGlobe({ spin, lng, onTouch }: { spin: boolean; lng: number; onTouch?: ((lat: number, lng: number) => void) | undefined }) {
   const { map, bumpMap } = useTexture({ map: skinDay.url, bumpMap: bump.url });
   map.colorSpace = THREE.SRGBColorSpace;
   const earth = useRef<THREE.Mesh>(null);

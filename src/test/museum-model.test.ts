@@ -27,3 +27,10 @@ describe("day/night globe label", () => {
     expect(nightShare(0, 90, sun)).toBe(50);
   });
 });
+
+import { childLine } from "@/lib/museum-model";
+describe("spoken line matches the place", () => {
+  it("never mentions waves on land", () => expect(childLine("ocean","x",0,true)).not.toMatch(/listen to the .*waves/i));
+  it("never mentions trees birds at sea", () => expect(childLine("forest","x",0.8,false)).toMatch(/no trees/));
+  it("says the sea has no city lights", () => expect(childLine("lights","x",0,false)).toMatch(/no city lights/));
+});

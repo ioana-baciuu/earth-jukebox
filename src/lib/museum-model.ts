@@ -42,12 +42,25 @@ export function dayPhase(lat: number, lng: number, sun: { lat: number; lng: numb
 export function nightShare(lat: number, lng: number, sun: { lat: number; lng: number }) {
   return Math.round(((1 - sunCosine(lat, lng, sun)) / 2) * 100);
 }
-const CHILD_LINE: Record<MuseumLayer, (w: string) => string> = {
-  ocean: w => `Sea temperature here: ${w}. Listen to the waves.`,
-  storm: w => `Lightning here: ${w}. Listen for the thunder.`,
-  forest: w => `Forest here: ${w}. Listen to the birds in the trees.`,
-  lights: w => `City lights here: ${w}. Listen to the bells of the night.`,
-};
+/** Spoken line that matches what is really at the touched spot (land vs sea, none vs a lot). */
+export function childLine(layer: MuseumLayer, word: string, amount: number, onLand: boolean) {
+  const none = amount < 0.12;
+  switch (layer) {
+    case "ocean":
+      return onLand ? "This is land, so there is no sea here. Move to the water to hear the waves."
+        : `Sea temperature here: ${word}. Listen to the ${amount > 0.62 ? "warm, gentle" : amount < 0.38 ? "cold, deep" : "rolling"} waves.`;
+    case "storm":
+      return none ? `Almost no lightning here, the sky is quiet${onLand ? "" : " over the sea"}.`
+        : `Lightning here: ${word}. Listen for the thunder${amount > 0.62 ? ", it is close and loud" : " far away"}.`;
+    case "forest":
+      return !onLand ? "This is open sea, so there are no trees here. Move to land to hear the forest."
+        : none ? "Very few trees grow here, so the birds are quiet."
+        : `Forest here: ${word}. Listen to the birds in the trees.`;
+    case "lights":
+      return none ? (onLand ? "Very few city lights here, the night is dark and quiet." : "This is the sea at night, no city lights here.")
+        : `City lights here: ${word}. Listen to the bells of the night.`;
+  }
+}
 export function museumSnapshot(layer: MuseumLayer, lat: number, lng: number, value?: number) {
   const sample = sampleEarth(lat, lng);
   if (value !== undefined) sample[layer] = Math.max(0, Math.min(1, value));
@@ -56,5 +69,5 @@ export function museumSnapshot(layer: MuseumLayer, lat: number, lng: number, val
   const word = layer === "ocean" && sample.land > 0.6 ? "No sea here" : LAYERS[layer].levels[levelIndex(amount)];
   return { lat, lng, sample, amount, name, word, pitch: latitudeToFreq(lat), pan: longitudeToPan(lng),
     thermal: layer !== "ocean" || sample.land > 0.6 ? "Neutral" : amount < 0.38 ? "Cool" : amount > 0.62 ? "Warm" : "Mild",
-    caption: `You touched ${name}. ${CHILD_LINE[layer](word)}` };
+    caption: `You touched ${name}. ${childLine(layer, word, amount, sample.land > 0.5)}` };
 }

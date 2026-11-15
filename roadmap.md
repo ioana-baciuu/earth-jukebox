@@ -1,4 +1,5 @@
 # Earth Jukebox roadmap
+- [x] Add a themed Contact tab using the uploaded team image and correct name/email pairs; verify email links and mobile layout
 - [x] Add a themed Business & Costs tab with the attached planning estimates, funding options and clearly stated assumptions; verify navigation and mobile layout
 - [x] Deliver a separate three-minute jury PDF with the uploaded future-funded tactile concept, QR and clickable website link; remove the website presentation
 - [x] Build and verify the seven-slide, three-minute themed jury presentation with QR, live links, notes and PDF printing

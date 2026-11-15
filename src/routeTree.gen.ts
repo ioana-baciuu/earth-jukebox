@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BusinessRouteImport } from './routes/business'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as MuseumRouteImport } from './routes/museum'
 import { Route as YourMapRouteImport } from './routes/your-map'
 
@@ -30,6 +31,11 @@ const BusinessRoute = BusinessRouteImport.update({
   path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MuseumRoute = MuseumRouteImport.update({
   id: '/museum',
   path: '/museum',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/business': typeof BusinessRoute
+  '/contact': typeof ContactRoute
   '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/business': typeof BusinessRoute
+  '/contact': typeof ContactRoute
   '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
@@ -60,21 +68,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/business': typeof BusinessRoute
+  '/contact': typeof ContactRoute
   '/museum': typeof MuseumRoute
   '/your-map': typeof YourMapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/business' | '/museum' | '/your-map'
+  fullPaths: '/' | '/about' | '/business' | '/contact' | '/museum' | '/your-map'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/business' | '/museum' | '/your-map'
-  id: '__root__' | '/' | '/about' | '/business' | '/museum' | '/your-map'
+  to: '/' | '/about' | '/business' | '/contact' | '/museum' | '/your-map'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/business'
+    | '/contact'
+    | '/museum'
+    | '/your-map'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BusinessRoute: typeof BusinessRoute
+  ContactRoute: typeof ContactRoute
   MuseumRoute: typeof MuseumRoute
   YourMapRoute: typeof YourMapRoute
 }
@@ -102,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/museum': {
       id: '/museum'
       path: '/museum'
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BusinessRoute: BusinessRoute,
+  ContactRoute: ContactRoute,
   MuseumRoute: MuseumRoute,
   YourMapRoute: YourMapRoute,
 }

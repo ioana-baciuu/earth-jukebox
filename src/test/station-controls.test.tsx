@@ -7,7 +7,7 @@ import { StationShowcase } from '@/components/jukebox/station/StationShowcase';
 const { speak, announce } = vi.hoisted(() => ({ speak: vi.fn(), announce: vi.fn() }));
 vi.mock('@tanstack/react-router', () => ({ ClientOnly: ({ children }: { children: ReactNode }) => children }));
 vi.mock('@/lib/a11y', () => ({ useA11y: () => ({ settings: { volume: 0.85, calmMotion: true }, speak, announce, buzz: vi.fn() }) }));
-vi.mock('@/lib/audio/engine', () => ({ getEngine: async () => ({ setVolume: vi.fn(), setSample: vi.fn(), setMix: vi.fn(), marimba: vi.fn() }) }));
+vi.mock('@/lib/audio/engine', () => ({ getEngine: async () => ({ setVolume: vi.fn(), setSample: vi.fn(), setMix: vi.fn(), marimba: vi.fn(), coast: vi.fn() }) }));
 vi.mock('@/components/jukebox/station/Station3D', () => ({ default: ({ onTouch }: { onTouch: (lat: number, lng: number) => void }) => <button onClick={() => onTouch(52, 13)}>Test globe touch</button> }));
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 

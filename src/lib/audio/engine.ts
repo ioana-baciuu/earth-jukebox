@@ -653,7 +653,7 @@ export class AudioEngine {
 
   setVolume(v: number) {
     this.volume = v;
-    this.master.gain.setTargetAtTime(this.ducked ? v * 0.35 : v, this.ctx.currentTime, 0.2);
+    this.master.gain.setTargetAtTime(this.ducked ? v * 0.6 : v, this.ctx.currentTime, 0.2);
   }
   /** Lower the music while the narrator speaks. */
   duck(on: boolean) {

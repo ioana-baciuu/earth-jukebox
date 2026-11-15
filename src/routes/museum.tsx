@@ -1,7 +1,6 @@
 import { STATION_SPECS } from "@/lib/station-parts";
 import { createFileRoute } from "@tanstack/react-router";
 import { Hand, Headphones, Keyboard, Monitor, School, Vibrate } from "lucide-react";
-import { MuseumSimulator } from "@/components/jukebox/MuseumSimulator";
 import { StationShowcase } from "@/components/jukebox/station/StationShowcase";
 import { STATION_PARTS } from "@/lib/station-parts";
 
@@ -183,7 +182,6 @@ function MuseumPage() {
          CYSA Sphere · A working digital prototype for blind and low-vision explorers.
       </p>
 
-       <div className="mt-8"><MuseumSimulator /></div>
 
       <StationShowcase />
 

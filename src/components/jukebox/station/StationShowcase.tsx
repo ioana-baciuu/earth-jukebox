@@ -9,6 +9,9 @@ import { joystickMove, type MuseumLayer } from "@/lib/museum-model";
 import { LAYERS } from "@/lib/layers";
 import { describePlace } from "@/lib/places";
 import { sampleEarth } from "@/lib/earth-data";
+import { museumSnapshot } from "@/lib/museum-model";
+import { getEngine } from "@/lib/audio/engine";
+import { coastCrossing } from "@/lib/sonify-map";
 import type { KioskAction, KioskState } from "./Station3D";
 const Station3D = lazy(() => import("./Station3D"));
 const ACTION_LABEL: Record<KioskAction, string> = { ocean: "Sea Temperature key", storm: "Lightning key", forest: "Forest Height key", lights: "Night Lights key", where: "Where am I?", west: "Joystick west", east: "Joystick east" };
@@ -16,7 +19,9 @@ const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard,
 
 
 export function StationShowcase() {
-  const { settings, announce } = useA11y();
+  const { settings, announce, speak, buzz } = useA11y();
+  const lastLand = useRef<number | null>(null);
+  const [touched, setTouched] = useState<string | null>(null);
   const [selected, setSelected] = useState<StationPartId | null>(null);
   const [ready, setReady] = useState(false);
   const hotspotElements = useRef<Partial<Record<StationPartId, HTMLButtonElement | null>>>({});
@@ -33,6 +38,19 @@ export function StationShowcase() {
       setKiosk({ layer, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 });
     }
   };
+  const touch = async (lat: number, lng: number) => {
+    const snap = museumSnapshot(kiosk.layer, lat, lng);
+    setTouched(snap.caption);
+    setKiosk((k) => ({ ...k, lng, lastAction: "TOUCHED GLOBE", pressed: null, pressedAt: performance.now(), tilt: 0 }));
+    speak(snap.caption); announce(snap.caption);
+    const e = await getEngine();
+    const crossing = lastLand.current === null ? null : coastCrossing(lastLand.current, snap.sample.land);
+    lastLand.current = snap.sample.land;
+    e.setVolume(settings.volume); e.setSample(snap.sample);
+    e.setMix({ [kiosk.layer]: 0.15 + 0.85 * snap.amount });
+    e.marimba(snap.pitch, 0.12, snap.pan);
+    if (crossing) { e.coast(crossing === "to-land", snap.pan); buzz(crossing === "to-land" ? [40, 30, 80] : [100]); }
+  };
   const select = (id: StationPartId | null) => {
     setSelected(id);
     const p = STATION_PARTS.find((x) => x.id === id);
@@ -45,7 +63,7 @@ export function StationShowcase() {
       <p className="mt-3 max-w-3xl text-lg text-muted-foreground">
         Turn the model by dragging. Choose a part to zoom in. This is the station a museum or school would buy: five parts, one sturdy wooden pedestal.
       </p>
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
+      <div className="mt-6 grid items-start gap-6 xl:grid-cols-[2.2fr_1fr]">
         <div
           className="station-stage"
           data-scene-ready={ready ? "true" : undefined}
@@ -54,7 +72,7 @@ export function StationShowcase() {
         >
           <ClientOnly fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
             <Suspense fallback={<p className="grid h-full place-items-center text-muted-foreground">Loading 3D station…</p>}>
-              <Station3D kiosk={kiosk} onPress={press} selected={selected} hotspotElements={hotspotElements} spin={!settings.calmMotion} onReady={() => setReady(true)} />
+              <Station3D onTouch={touch} kiosk={kiosk} onPress={press} selected={selected} hotspotElements={hotspotElements} spin={!settings.calmMotion} onReady={() => setReady(true)} />
             </Suspense>
           </ClientOnly>
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -76,7 +94,8 @@ export function StationShowcase() {
         <div className="flex flex-col gap-3">
           <div className="surface p-4" aria-live="polite">
             <p className="text-xs font-bold uppercase text-primary">Try the controls</p>
-            <p className="mt-1 text-sm text-muted-foreground">Click the keys, the pink Where am I? key or either side of the joystick on the model, or use these buttons. The tablet shows what was pressed.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Tap the globe to hear that place. Click the keys, the pink Where am I? key or either side of the joystick on the model, or use these buttons. The tablet shows what was pressed.</p>
+            {touched && <p className="mt-2 rounded-md bg-primary/15 p-2 text-sm font-bold">{touched}</p>}
             <p className="mt-2 font-bold">Pressed: {kiosk.lastAction.toLowerCase()} · {LAYERS[kiosk.layer].name} · {Math.abs(Math.round(kiosk.lng))}° {kiosk.lng < 0 ? "W" : "E"}</p>
             <div className="mt-3 grid grid-cols-4 gap-2">
               {(["ocean", "storm", "forest", "lights"] as const).map((id) => (

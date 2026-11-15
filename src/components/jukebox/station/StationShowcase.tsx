@@ -16,7 +16,7 @@ const ICONS: Record<StationPartId, LucideIcon> = { globe: Hand, panel: Keyboard,
 
 const SPECS = [
   ["Footprint", "118 × 70 cm, fits a 150 cm wheelchair turning circle beside it"],
-  ["Panel height", "90 cm front edge, sloped 18° toward the child"],
+  ["Panel height", "65 cm front edge, sloped 18° toward the child; globe equator at 96 cm, chest height for a 110–120 cm child"],
   ["Globe", "60 cm tactile relief, 128 touch zones, north fixed upright"],
   ["Audio", "Two stereo headphone ports with volume limit"],
   ["Power", "One standard socket; runs offline from a built-in computer"],

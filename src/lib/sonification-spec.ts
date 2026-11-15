@@ -74,7 +74,7 @@ export const ERIE_SPECS: Record<CoreLayerId, ErieSpec> = {
   },
 };
 
-/**
+/** App layer ids → Erie spec. */
 const ERIE_FOR_LAYER: Partial<Record<LayerId | string, CoreLayerId>> = {
   ocean: "ocean", waves: "ocean", sea: "ocean",
   storm: "storm", thunder: "storm", lightning: "storm",

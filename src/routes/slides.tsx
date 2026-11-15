@@ -6,7 +6,7 @@ import { ScaledSlide } from "@/components/presentation/ScaledSlide";
 import { JurySlide } from "@/components/presentation/JurySlide";
 import { JURY_SLIDES, PROJECT_URL, slideIndex } from "@/lib/jury-deck";
 export const Route = createFileRoute("/slides")({
-  validateSearch: (search: Record<string, unknown>): { slide?: number; print?: boolean; presenter?: boolean } => ({ slide: slideIndex(search.slide ?? 1), ...(search.print ? { print: true } : {}), ...(search.presenter ? { presenter: true } : {}) }),
+  validateSearch: (search: Record<string, unknown>): { slide?: number; print?: boolean; presenter?: boolean } => ({ slide: slideIndex(search['slide'] ?? 1), ...(search['print'] ? { print: true } : {}), ...(search['presenter'] ? { presenter: true } : {}) }),
   head: () => ({ meta: [
     { title: "Earth Jukebox — CYSA Sphere jury presentation" },
     { name: "description", content: "Seven slides, three minutes: an accessible NASA Earth-science museum prototype by CYSA Sphere." },

@@ -40,4 +40,3 @@ use the editor.
 - Model the fourth station part as a globe-surface feedback overlay sharing the globe camera target, not as a separate mesh on the pedestal, so the prototype illustrates integrated touch hardware.
 - Project 3D station hotspots into buttons owned by the page's React root; avoid separate Html roots that race during React 19 cleanup.
 - Research-inspired sonification rules (Erie specs, DIXTRAL probe, Umwelt snapshot, evaluation validator) live in `src/lib/sonification-spec.ts` with tests in `src/test/`; route files only export `Route`, so never embed helpers or in-source tests there.
-- The Explore page's Particle Earth (`src/components/jukebox/particle/ParticleEarth.tsx`) is lazy-loaded behind ClientOnly and samples the same NASA grids as the photo globe, so both views pick the same places.

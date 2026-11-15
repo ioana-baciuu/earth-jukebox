@@ -393,7 +393,7 @@
 .daynight-badge[data-phase=night] { border-color:var(--primary); }
 .daynight-meter { height:8px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--muted)); overflow:hidden; }
 .daynight-meter > span { display:block; height:100%; background:var(--primary); transition:width .35s ease; }
-.station-stage { position:relative; height:560px; border-radius:8px; overflow:hidden; border:0; background:radial-gradient(circle at 50% 35%, color-mix(in oklab,var(--primary) 14%,var(--card)), var(--space) 70%); }
+.station-stage { position:relative; height:760px; border-radius:8px; overflow:hidden; border:0; background:radial-gradient(circle at 50% 35%, color-mix(in oklab,var(--primary) 14%,var(--card)), var(--space) 70%); }
 .station-hotspot { display:grid; place-items:center; width:34px; height:34px; border-radius:999px; background:var(--primary); color:var(--primary-foreground); font-weight:800; font-family:var(--font-display); border:3px solid var(--space); box-shadow:0 0 0 2px var(--primary); cursor:pointer; transition:transform .2s ease; }
 .station-hotspot[aria-pressed=true] { transform:scale(1.25); background:var(--foreground); box-shadow:0 0 0 3px var(--primary), 0 0 24px 6px color-mix(in oklab,var(--primary) 55%,transparent); }
-@media(max-width:800px){ .station-stage{ height:420px; } }
+@media(max-width:800px){ .station-stage{ height:520px; } }

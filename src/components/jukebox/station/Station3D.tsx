@@ -36,7 +36,7 @@ const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [nu
   panel: { label: [0.05, 0.76, 0.46], cam: [0.15, 1.1, 1.05], target: [0, 0.62, 0.33] },
   headphones: { label: [-0.6, 0.6, 0.1], cam: [-1.2, 1.2, 1.6], target: [-0.3, 0.8, 0.55] },
   feedback: { label: [-0.22, 1.12, 0.34], cam: [0.55, 1.25, 1.2], target: [0, 1.04, 0.04] },
-  tablet: { label: [0.5, 1.06, -0.1], cam: [1.0, 1.05, 0.65], target: [0.46, 0.9, -0.14] },
+  tablet: { label: [0.66, 1.06, 0.2], cam: [1.15, 1.05, 1.0], target: [0.62, 0.92, 0.14] },
 };
 
 function useCanvasTexture(draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void, w = 512, h = 512) {
@@ -73,7 +73,7 @@ function useWood() {
 }
 
 /** 1 · Tactile touch globe with real NASA skin and relief bump, seated on its cradle. */
-function TouchGlobe({ spin, lng }: { spin: boolean; lng: number }) {
+function TouchGlobe({ spin, lng, onTouch }: { spin: boolean; lng: number; onTouch?: ((lat: number, lng: number) => void) | undefined }) {
   const { map, bumpMap } = useTexture({ map: skinDay.url, bumpMap: bump.url });
   map.colorSpace = THREE.SRGBColorSpace;
   const earth = useRef<THREE.Mesh>(null);
@@ -86,7 +86,10 @@ function TouchGlobe({ spin, lng }: { spin: boolean; lng: number }) {
   });
   return (
     <group position={[0, 1.24, 0.04]}>
-      <mesh ref={earth} castShadow>
+      <mesh ref={earth} castShadow
+        onClick={(e) => { e.stopPropagation(); if (e.uv && onTouch) onTouch(e.uv.y * 180 - 90, e.uv.x * 360 - 180); }}
+        onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+        onPointerOut={() => { document.body.style.cursor = ""; }}>
         <sphereGeometry args={[0.36, 96, 64]} />
         <meshStandardMaterial map={map} bumpMap={bumpMap} bumpScale={6} roughness={0.75} metalness={0.02} />
       </mesh>
@@ -357,11 +360,11 @@ function Tablet({ state }: { state: KioskState }) {
   }, [state, imgs, canvas, tex]);
   return (
     <group>
-      <mesh position={[0.44, 0.95, -0.18]}>
+      <mesh position={[0.62, 0.95, 0.12]}>
         <cylinderGeometry args={[0.012, 0.016, 0.26, 16]} />
         <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
       </mesh>
-      <group position={[0.46, 1.1, -0.14]} rotation={[-0.3, -0.5, 0]}>
+      <group position={[0.62, 1.12, 0.14]} rotation={[-0.25, -0.35, 0]}>
         <RoundedBox args={[0.28, 0.165, 0.014]} radius={0.01} smoothness={3} castShadow>
           <meshStandardMaterial color={C.rubber} roughness={0.4} metalness={0.2} />
         </RoundedBox>
@@ -484,7 +487,9 @@ export default function Station3D({
   onReady,
   kiosk,
   onPress,
+  onTouch,
 }: {
+  onTouch?: (lat: number, lng: number) => void;
   kiosk: KioskState;
   onPress: (a: KioskAction) => void;
   selected: StationPartId | null;
@@ -510,7 +515,7 @@ export default function Station3D({
       <group position={[0, -0.2, 0]}>
       <group ref={reg("globe")}>
         <Suspense fallback={null}>
-          <TouchGlobe spin={spin} lng={kiosk.lng} />
+          <TouchGlobe spin={spin} lng={kiosk.lng} onTouch={onTouch} />
         </Suspense>
       </group>
       <Pedestal />

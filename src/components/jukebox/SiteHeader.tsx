@@ -8,6 +8,7 @@ const NAV = [
   { to: "/business", label: "Business & Costs" },
   { to: "/your-map", label: "Your map" },
   { to: "/about", label: "How it works" },
+  { to: "/contact", label: "Contact" },
 ] as const;
 
 export function SiteHeader() {

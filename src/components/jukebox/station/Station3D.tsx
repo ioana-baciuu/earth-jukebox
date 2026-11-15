@@ -33,7 +33,7 @@ const C = {
 const OVERVIEW = { cam: new THREE.Vector3(1.75, 1.55, 2.25), target: new THREE.Vector3(0, 0.85, 0) };
 const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [number, number, number]; target: [number, number, number] }> = {
   globe: { label: [0.32, 1.62, -0.06], cam: [0.6, 1.4, 1.4], target: [0, 1.22, -0.06] },
-  panel: { label: [-0.2, 0.92, 0.42], cam: [0.15, 1.3, 1.05], target: [0, 0.82, 0.33] },
+  panel: { label: [0.05, 0.96, 0.46], cam: [0.15, 1.3, 1.05], target: [0, 0.82, 0.33] },
   headphones: { label: [-0.6, 0.8, 0.1], cam: [-1.4, 1.0, 0.9], target: [-0.52, 0.62, 0.1] },
   feedback: { label: [-0.22, 1.3, 0.24], cam: [0.55, 1.4, 1.2], target: [0, 1.22, -0.06] },
   tablet: { label: [0.5, 1.26, -0.1], cam: [1.0, 1.25, 0.65], target: [0.46, 1.1, -0.14] },

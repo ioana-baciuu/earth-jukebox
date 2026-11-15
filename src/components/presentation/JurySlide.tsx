@@ -1,0 +1,28 @@
+import { QRCodeSVG } from "qrcode.react";
+import { Disc3, Hand, Headphones, Waves, CloudLightning, Trees, Sparkles, ArrowRight } from "lucide-react";
+import kiosk from "@/assets/presentation/kiosk-demo.png";
+import earth from "@/assets/presentation/earth-demo.png";
+import { JURY_SLIDES, PROJECT_URL } from "@/lib/jury-deck";
+import { STATION_PARTS } from "@/lib/station-parts";
+import { LAYERS } from "@/lib/layers";
+const DATA = [
+  { id: "ocean", label: "Sea temperature", mission: "ECCO2", source: "3912", sound: "Waves", icon: Waves },
+  { id: "storm", label: "Lightning", mission: "ISS LIS", source: "5011", sound: "Thunder", icon: CloudLightning },
+  { id: "forest", label: "Forest height", mission: "GEDI", source: "4950", sound: "Birds & wind", icon: Trees },
+  { id: "lights", label: "Night lights", mission: "Black Marble", source: "5276", sound: "Chimes", icon: Sparkles },
+] as const;
+export function JurySlide({ index }: { index: number }) {
+  const slide = JURY_SLIDES[index];
+  if (!slide) return null;
+  return <article className={`jury-slide jury-slide-${index + 1}`} aria-label={`Slide ${index + 1}: ${slide.title}`}>
+    <header className="jury-slide-header"><span><Disc3 /> EARTH JUKEBOX</span><span>{slide.criterion}</span></header>
+    {index === 0 ? <div className="jury-opening"><img src={earth} alt="The working NASA Earth globe" /><div><p className="jury-kicker">CYSA Sphere · NASA Space Apps</p><h1 className="jury-title-lg">Earth Jukebox</h1><p className="jury-subtitle">An Earth every child<br />can touch and hear.</p><p className="jury-body jury-intro">Accessible Earth-science discovery for blind and low-vision children.</p></div></div> : <h2 className="jury-title">{slide.title}</h2>}
+    {index === 1 && <><p className="jury-body-lg">NASA Earth imagery becomes a multisensory instrument.</p><div className="jury-experience"><div><Hand /><h3>Choose a layer</h3><p>Four familiar sound worlds.</p></div><ArrowRight /><div><Disc3 /><h3>Touch a region</h3><p>One place on globe and tablet.</p></div><ArrowRight /><div><Headphones /><h3>Hear the Earth</h3><p>Sound with spoken place guidance.</p></div></div><div className="jury-sounds">{DATA.map(d => <div key={d.id} className={`layer-${d.id}`}><d.icon /><span>{d.label}</span><strong>{d.sound}</strong></div>)}</div></>}
+    {index === 2 && <div className="jury-hardware"><img src={kiosk} alt="Actual 3D station prototype with a child, globe and numbered controls" /><div>{STATION_PARTS.map(p => <p key={p.id}><b>{p.n}</b><span>{p.title}</span></p>)}<p className="jury-caption">Proposed: 118 × 70 cm footprint · 65 cm panel<br />60 cm tactile globe · east–west joystick</p></div></div>}
+    {index === 3 && <><div className="jury-data">{DATA.map(d => <div key={d.id} className={`layer-${d.id}`}><img src={LAYERS[d.id].image} alt={LAYERS[d.id].imageAlt} /><d.icon /><h3>{d.label}</h3><p>{d.mission}</p><a href={`https://svs.gsfc.nasa.gov/${d.source}/`} target="_blank" rel="noreferrer">NASA SVS {d.source} ↗</a></div>)}</div><p className="jury-pipeline">NASA movies <ArrowRight /> Python + FFmpeg <ArrowRight /> 48-frame atlases <ArrowRight /> Live synthesized sound</p><p className="jury-caption">Image-colour proxies, not calibrated measurements. GEDI is a rotating-camera explanation, not geographic frame probing.</p></>}
+    {index === 4 && <div className="jury-demo"><img src={kiosk} alt="Working museum station demonstration" /><div><p className="jury-kicker">30-second live demonstration</p><ol><li>Choose sea temperature.</li><li>Touch a place and listen.</li><li>Move east or west.</li><li>Switch to another layer.</li></ol><a className="jury-demo-link" href={`${PROJECT_URL}/museum`} target="_blank" rel="noreferrer">Open museum demo <ArrowRight /></a><p className="jury-caption">Web prototype: pressable controls, shared tablet selection and region-aware sound.</p></div></div>}
+    {index === 5 && <><p className="jury-body-lg">Blind, low-vision and sighted children exploring together.</p><div className="jury-impact"><div><span>01</span><h3>Inclusive discovery</h3><p>Touch and sound alongside visual maps.</p></div><div><span>02</span><h3>Museums & schools</h3><p>A shared station for Earth-science learning.</p></div><div><span>03</span><h3>Co-design next</h3><p>Test with children, families and educators.</p></div></div><p className="jury-caption">Working web demo today. Physical hardware, safety and learning outcomes still require validation.</p></>}
+    {index === 6 && <div className="jury-closing"><a href={PROJECT_URL} target="_blank" rel="noreferrer" className="jury-qr" aria-label="Open Earth Jukebox"><QRCodeSVG value={PROJECT_URL} size={340} level="M" marginSize={4} fgColor="var(--qr-ink)" bgColor="var(--qr-paper)" /></a><div><p className="jury-kicker">Four women in STEM</p><h3 className="jury-subtitle">CYSA Sphere</h3><p className="jury-body">Ioana Baciu · Ana Buescu<br />Claudia Maria Bănesanu<br /><span className="jury-caption">[Fourth team member — name to confirm]</span></p><a href={PROJECT_URL} target="_blank" rel="noreferrer" className="jury-site-link">earth-orchestra-globe.lovable.app ↗</a><p className="jury-body-lg">A planet to explore.<br />No sight required.</p></div></div>}
+    <footer className="jury-slide-footer"><span>CYSA Sphere · {index === 2 ? "Physical concept — not built hardware" : "NASA data · Accessible discovery"}</span><span>{String(index + 1).padStart(2, "0")} / 07</span></footer>
+  </article>;
+}

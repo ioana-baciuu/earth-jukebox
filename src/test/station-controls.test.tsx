@@ -21,9 +21,9 @@ describe('museum spoken controls', () => {
     expect(announce).toHaveBeenLastCalledWith(message);
     await waitFor(() => expect(screen.getByText(`"${message}"`)).toBeInTheDocument());
   });
-  it.each(['Sea Temperature', 'Lightning', 'Forest Height', 'Night Lights', '← West', 'East →'])('speaks when pressing %s', (name) => {
+  it.each(['Sea temperature', 'Lightning & thunder', 'Forest height', 'Night lights', '← West', 'East →'])('speaks when pressing %s', (name) => {
     render(<StationShowcase />);
-    fireEvent.click(screen.getByRole('button', { name, exact: true }));
+    fireEvent.click(screen.getByRole('button', { name }));
     expect(speak).toHaveBeenCalledTimes(1);
     expect(announce).toHaveBeenCalledWith(speak.mock.lastCall?.[0]);
   });

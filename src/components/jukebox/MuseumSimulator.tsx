@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Headphones, RotateCcw, Square, Sun, Moon, Thermometer, Volume2, Music4, Gamepad2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Headphones, RotateCcw, Square, Sun, Moon, Thermometer, Volume2, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import skinDay from "@/assets/earth/skin-day.jpg.asset.json";
 import skinLights from "@/assets/earth/skin-lights.jpg.asset.json";

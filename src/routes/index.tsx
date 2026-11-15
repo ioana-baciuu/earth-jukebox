@@ -279,7 +279,6 @@ function Index() {
                 label={globeLabel}
                 onPick={pickOnGlobe}
                 onKeyDown={onGlobeKey}
-                aria-describedby="probe-caption"
               />
               <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-base font-bold text-muted-foreground">
                 <span className="rounded-full bg-background/80 px-4 py-2">

@@ -18,8 +18,8 @@ const TRUST: { v: EvaluationResponse["scientificTrust"]; label: string }[] = [
   { v: "low", label: "Not much" },
 ];
 
-function Choice<T extends string | number>({ name, legend, options, value, onPick }: {
-  name: string; legend: string; options: { v: T; label: string }[]; value?: T; onPick: (v: T) => void;
+function Choice<T extends string>({ name, legend, options, value, onPick }: {
+  name: string; legend: string; options: { v: T; label: string }[]; value?: T | undefined; onPick: (v: T) => void;
 }) {
   return (
     <fieldset className="min-w-0">

@@ -128,8 +128,8 @@ export function dixtralProbe(lat: number, lng: number, layer: CoreLayerId, value
 export interface UmweltState {
   target: { lat: number; lng: number; name: string };
   layer: CoreLayerId;
-  frameIndex?: number;
-  frameDate?: string;
+  frameIndex?: number | undefined;
+  frameDate?: string | undefined;
   dataValue: number;
   visualReticlePx: { x: number; y: number };
   audioSynthParams: { frequency: number; rate: number };

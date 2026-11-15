@@ -4,7 +4,6 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -129,7 +128,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const isPresentation = useRouterState({ select: (state) => state.location.pathname === "/slides" });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -137,12 +135,12 @@ function RootComponent() {
         <a href="#main" className="skip-link">
           Skip to the globe
         </a>
-        {!isPresentation && <SiteHeader />}
+        <SiteHeader />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <main id="main" tabIndex={-1} className="outline-none">
           <Outlet />
         </main>
-        {!isPresentation && <SiteFooter />}
+        <SiteFooter />
       </A11yProvider>
     </QueryClientProvider>
   );

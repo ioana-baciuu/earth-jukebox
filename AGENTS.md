@@ -30,7 +30,7 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Project rules
-- The jury deck uses one 1920×1080 ScaledSlide and a central timed registry, with URL slide selection and local editable notes; this keeps editor, presenter, thumbnails and print output consistent.
+- Jury presentations are standalone PDF deliverables, not website routes, so the exhibit experience stays separate from competition materials.
 - NASA animations are offline-extracted into 48-frame image atlases with source manifests; only flat global sequences support geographic frame probing, because rotating camera films cannot be sampled by latitude/longitude.
 - The museum simulator and tablet share one geographic selection; joystick movement preserves latitude, and thermal feedback is a qualitative simulation rather than hardware or a safety specification.
 - Sound is synthesized live with Web Audio in `src/lib/audio/engine.ts` (one voice per Earth layer); keep pure value→sound rules in `src/lib/sonify-map.ts` so they stay unit-tested.

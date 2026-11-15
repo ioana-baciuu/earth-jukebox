@@ -12,7 +12,7 @@ export type StationPartId = (typeof STATION_PARTS)[number]["id"];
 export const STATION_SPECS: [string, string][] = [
   ["Footprint", "118 × 70 cm, fits a 150 cm wheelchair turning circle beside it"],
   ["Panel height", "65 cm front edge, sloped 18° toward the child"],
-  ["Globe", "60 cm tactile relief, equator at 96 cm (chest height), 128 touch zones, north fixed upright"],
+  ["Globe", "60 cm tactile relief, 128 touch zones, north fixed upright"],
   ["Audio", "Two stereo headphone ports with volume limit"],
   ["Power", "One standard socket; runs offline from a built-in computer"],
   ["Materials", "Birch plywood, wipe-clean resin globe, rubber Braille keys"],

@@ -1,3 +1,4 @@
+import type React from "react";
 import { Suspense, useEffect, useMemo, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer, OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
@@ -5,6 +6,15 @@ import * as THREE from "three";
 import skinDay from "@/assets/earth/skin-day.jpg.asset.json";
 import bump from "@/assets/earth/earth-bump.jpg.asset.json";
 import sst from "@/assets/earth/nasa-sst.jpg.asset.json";
+import lightning from "@/assets/earth/nasa-lightning.jpg.asset.json";
+import forestImg from "@/assets/earth/nasa-forest.jpg.asset.json";
+import night from "@/assets/earth/nasa-night.jpg.asset.json";
+import type { MuseumLayer } from "@/lib/museum-model";
+
+/** What the visitor last did on the 3D station, mirrored on the tablet screen. */
+export type KioskState = { layer: MuseumLayer; lng: number; lastAction: string; pressed: string | null; pressedAt: number; tilt: number };
+export type KioskAction = MuseumLayer | "where" | "west" | "east";
+const LAYER_NAME: Record<MuseumLayer, string> = { ocean: "SEA TEMPERATURE", storm: "LIGHTNING", forest: "FOREST HEIGHT", lights: "NIGHT LIGHTS" };
 import { STATION_PARTS, type StationPartId } from "@/lib/station-parts";
 
 /** WebGL needs plain colours; these mirror --primary and the --layer-* tokens in styles.css. */
@@ -22,11 +32,11 @@ const C = {
 
 const OVERVIEW = { cam: new THREE.Vector3(1.75, 1.55, 2.25), target: new THREE.Vector3(0, 0.85, 0) };
 const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [number, number, number]; target: [number, number, number] }> = {
-  globe: { label: [0.28, 1.5, -0.12], cam: [0.8, 1.45, 1.25], target: [0, 1.15, -0.12] },
-  panel: { label: [-0.2, 1.02, 0.25], cam: [0.2, 1.55, 1.15], target: [0, 0.9, 0.17] },
-  headphones: { label: [-0.7, 0.8, 0.1], cam: [-1.5, 1.0, 0.9], target: [-0.62, 0.62, 0.1] },
-  feedback: { label: [-0.18, 1.2, 0.16], cam: [0.65, 1.4, 1.1], target: [0, 1.18, -0.12] },
-  tablet: { label: [0.6, 1.33, -0.02], cam: [1.4, 1.35, 0.95], target: [0.56, 1.12, -0.04] },
+  globe: { label: [0.32, 1.62, -0.06], cam: [0.6, 1.4, 1.4], target: [0, 1.22, -0.06] },
+  panel: { label: [0.05, 0.96, 0.46], cam: [0.15, 1.3, 1.05], target: [0, 0.82, 0.33] },
+  headphones: { label: [-0.6, 0.8, 0.1], cam: [-1.4, 1.0, 0.9], target: [-0.52, 0.62, 0.1] },
+  feedback: { label: [-0.22, 1.3, 0.24], cam: [0.55, 1.4, 1.2], target: [0, 1.22, -0.06] },
+  tablet: { label: [0.5, 1.26, -0.1], cam: [1.0, 1.25, 0.65], target: [0.46, 1.1, -0.14] },
 };
 
 function useCanvasTexture(draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void, w = 512, h = 512) {
@@ -63,67 +73,105 @@ function useWood() {
 }
 
 /** 1 · Tactile touch globe with real NASA skin and relief bump, seated on its cradle. */
-function TouchGlobe({ spin }: { spin: boolean }) {
+function TouchGlobe({ spin, lng }: { spin: boolean; lng: number }) {
   const { map, bumpMap } = useTexture({ map: skinDay.url, bumpMap: bump.url });
   map.colorSpace = THREE.SRGBColorSpace;
   const earth = useRef<THREE.Mesh>(null);
   useFrame((_, dt) => {
-    if (spin && earth.current) earth.current.rotation.y += Math.min(dt, 0.05) * 0.18;
+    if (!earth.current) return;
+    // Joystick longitude faces the visitor; it eases there unless calm motion is on.
+    const goal = -(lng * Math.PI) / 180 - Math.PI / 2;
+    const r = earth.current.rotation;
+    r.y = spin ? r.y + (goal - r.y) * (1 - Math.exp(-5 * Math.min(dt, 0.05))) : goal;
   });
   return (
-    <group position={[0, 1.18, -0.12]}>
+    <group position={[0, 1.24, -0.06]}>
       <mesh ref={earth} castShadow>
-        <sphereGeometry args={[0.3, 96, 64]} />
+        <sphereGeometry args={[0.36, 96, 64]} />
         <meshStandardMaterial map={map} bumpMap={bumpMap} bumpScale={6} roughness={0.75} metalness={0.02} />
       </mesh>
       {/* cradle */}
-      <mesh position={[0, -0.31, 0]}>
-        <cylinderGeometry args={[0.11, 0.16, 0.08, 48]} />
+      <mesh position={[0, -0.37, 0]}>
+        <cylinderGeometry args={[0.13, 0.18, 0.06, 48]} />
         <meshStandardMaterial color={C.navy} metalness={0.4} roughness={0.4} />
       </mesh>
     </group>
   );
 }
 
-/** 2 · Sloped control panel: four Braille dataset buttons, Where am I? key and one-axis joystick. */
-function ControlPanel() {
-  const keys = [C.ocean, C.storm, C.forest, C.lights];
+/** 2 · Sloped front control panel, lower than the globe: four Braille keys, Where am I? and an east/west joystick. Every part is clickable. */
+function PressKey({ id, state, onPress, children, position }: { id: KioskAction; state: KioskState; onPress: (a: KioskAction) => void; children: React.ReactNode; position: [number, number, number] }) {
+  const g = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (!g.current) return;
+    const down = state.pressed === id && performance.now() - state.pressedAt < 260;
+    g.current.position.y += ((down ? position[1] - 0.014 : position[1]) - g.current.position.y) * 0.35;
+  });
   return (
-    <group position={[0, 0.9, 0.17]} rotation={[0.32, 0, 0]}>
-      <RoundedBox args={[1.0, 0.05, 0.3]} radius={0.015} smoothness={3} castShadow>
+    <group ref={g} position={position}
+      onClick={(e) => { e.stopPropagation(); onPress(id); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = ""; }}>
+      {children}
+    </group>
+  );
+}
+function ControlPanel({ state, onPress }: { state: KioskState; onPress: (a: KioskAction) => void }) {
+  const keys: [MuseumLayer, string][] = [["ocean", C.ocean], ["storm", C.storm], ["forest", C.forest], ["lights", C.lights]];
+  const stick = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (!stick.current) return;
+    const live = performance.now() - state.pressedAt < 400 ? state.tilt : 0;
+    stick.current.rotation.z += (-live * 0.45 - stick.current.rotation.z) * 0.25;
+  });
+  return (
+    <group position={[0, 0.82, 0.33]} rotation={[0.45, 0, 0]}>
+      <RoundedBox args={[0.86, 0.045, 0.24]} radius={0.015} smoothness={3} castShadow>
         <meshStandardMaterial color={C.navy} roughness={0.55} metalness={0.15} />
       </RoundedBox>
-      {keys.map((color, i) => (
-        <group key={color} position={[-0.39 + i * 0.13, 0.035, -0.02]}>
+      {keys.map(([id, color], i) => (
+        <PressKey key={id} id={id} state={state} onPress={onPress} position={[-0.34 + i * 0.11, 0.032, 0]}>
           <mesh castShadow>
-            <cylinderGeometry args={[0.048, 0.052, 0.03, 40]} />
-            <meshStandardMaterial color={color} roughness={0.35} />
+            <cylinderGeometry args={[0.042, 0.046, 0.03, 40]} />
+            <meshStandardMaterial color={color} roughness={0.35} emissive={color} emissiveIntensity={state.layer === id ? 0.55 : 0} />
           </mesh>
-          {/* raised Braille-style dots */}
           {[0, 1, 2].map((d) => (
-            <mesh key={d} position={[-0.02 + d * 0.02, -0.01, 0.085]}>
+            <mesh key={d} position={[-0.018 + d * 0.018, 0.016, 0.0]}>
               <sphereGeometry args={[0.006, 12, 8]} />
               <meshStandardMaterial color={C.cream} roughness={0.6} />
             </mesh>
           ))}
-        </group>
+        </PressKey>
       ))}
-      <RoundedBox args={[0.12, 0.03, 0.09]} radius={0.01} position={[0.17, 0.035, -0.02]}>
-        <meshStandardMaterial color={C.pink} roughness={0.4} />
-      </RoundedBox>
-      {/* joystick: east/west slot only */}
-      <group position={[0.37, 0.03, -0.02]}>
+      <PressKey id="where" state={state} onPress={onPress} position={[0.12, 0.032, 0]}>
+        <RoundedBox args={[0.1, 0.03, 0.08]} radius={0.01}>
+          <meshStandardMaterial color={C.pink} roughness={0.4} />
+        </RoundedBox>
+      </PressKey>
+      {/* joystick: east/west slot only. Click the left half for west, right half for east. */}
+      <group position={[0.31, 0.028, 0]}>
         <RoundedBox args={[0.16, 0.012, 0.035]} radius={0.006}>
           <meshStandardMaterial color={C.rubber} roughness={0.9} />
         </RoundedBox>
-        <mesh position={[0, 0.06, 0]} rotation={[0, 0, -0.25]}>
-          <cylinderGeometry args={[0.01, 0.012, 0.11, 16]} />
-          <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.25} />
-        </mesh>
-        <mesh position={[0.026, 0.115, 0]} castShadow>
-          <sphereGeometry args={[0.026, 24, 16]} />
-          <meshStandardMaterial color={C.pink} roughness={0.3} />
-        </mesh>
+        <group ref={stick}>
+          <mesh position={[0, 0.055, 0]}>
+            <cylinderGeometry args={[0.01, 0.012, 0.11, 16]} />
+            <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.25} />
+          </mesh>
+          <mesh position={[0, 0.11, 0]} castShadow>
+            <sphereGeometry args={[0.026, 24, 16]} />
+            <meshStandardMaterial color={C.pink} roughness={0.3} />
+          </mesh>
+        </group>
+        {(["west", "east"] as const).map((dir) => (
+          <mesh key={dir} position={[dir === "west" ? -0.045 : 0.045, 0.07, 0]}
+            onClick={(e) => { e.stopPropagation(); onPress(dir); }}
+            onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+            onPointerOut={() => { document.body.style.cursor = ""; }}>
+            <boxGeometry args={[0.09, 0.16, 0.08]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        ))}
       </group>
     </group>
   );
@@ -149,7 +197,7 @@ function Headphones() {
     [],
   );
   return (
-    <group>
+    <group position={[0.1, 0, 0]}>
       {/* hook */}
       <mesh position={[-0.6, 0.72, 0.1]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.01, 0.01, 0.1, 12]} />
@@ -188,10 +236,10 @@ function Headphones() {
 /** 4 · Concept overlay for actuators beneath the globe's touch surface. */
 function GlobeFeedback({ visible }: { visible: boolean }) {
   return (
-    <group position={[0, 1.18, -0.12]} visible={visible}>
+    <group position={[0, 1.24, -0.06]} visible={visible}>
       {[C.ocean, C.pink, C.storm].map((color, index) => (
         <mesh key={color} rotation={[0, -0.8 + index * 0.7, 0]}>
-          <sphereGeometry args={[0.303, 32, 20, 0.15, 0.55, 1.1, 0.65]} />
+          <sphereGeometry args={[0.363, 32, 20, 0.15, 0.55, 1.1, 0.65]} />
           <meshBasicMaterial color={color} transparent opacity={0.45} depthWrite={false} side={THREE.DoubleSide} />
         </mesh>
       ))}
@@ -199,23 +247,52 @@ function GlobeFeedback({ visible }: { visible: boolean }) {
   );
 }
 
-/** 5 · Companion tablet on an arm, showing a real NASA sea-temperature frame. */
-function Tablet() {
-  const screen = useTexture(sst.url);
-  screen.colorSpace = THREE.SRGBColorSpace;
+/** 5 · Companion tablet on an arm. Its screen redraws to show the dataset, place and the control just pressed. */
+function Tablet({ state }: { state: KioskState }) {
+  const imgs = useTexture({ ocean: sst.url, storm: lightning.url, forest: forestImg.url, lights: night.url });
+  const { canvas, tex } = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1024; canvas.height = 512;
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return { canvas, tex };
+  }, []);
+  useEffect(() => {
+    const ctx = canvas.getContext("2d");
+    const img = imgs[state.layer].image as CanvasImageSource | undefined;
+    if (!ctx) return;
+    const colour = C[state.layer];
+    ctx.fillStyle = C.navy; ctx.fillRect(0, 0, 1024, 512);
+    if (img) ctx.drawImage(img, 0, 96, 1024, 340);
+    // reticle at the joystick longitude
+    const x = ((state.lng + 180) / 360) * 1024;
+    ctx.strokeStyle = C.cream; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(x, 266, 22, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, 96); ctx.lineTo(x, 436); ctx.stroke();
+    ctx.fillStyle = colour; ctx.fillRect(0, 0, 1024, 96);
+    ctx.fillStyle = C.navy; ctx.font = "bold 52px Fredoka, sans-serif";
+    ctx.fillText(LAYER_NAME[state.layer], 28, 66);
+    ctx.font = "bold 34px 'Atkinson Hyperlegible', sans-serif"; ctx.textAlign = "right";
+    ctx.fillText(`${Math.abs(Math.round(state.lng))}° ${state.lng < 0 ? "W" : "E"}`, 996, 62);
+    ctx.textAlign = "left";
+    ctx.fillStyle = C.navy; ctx.fillRect(0, 436, 1024, 76);
+    ctx.fillStyle = C.cream; ctx.font = "bold 38px 'Atkinson Hyperlegible', sans-serif";
+    ctx.fillText(`PRESSED: ${state.lastAction}`, 28, 488);
+    tex.needsUpdate = true;
+  }, [state, imgs, canvas, tex]);
   return (
     <group>
-      <mesh position={[0.56, 0.98, -0.1]}>
-        <cylinderGeometry args={[0.012, 0.016, 0.3, 16]} />
+      <mesh position={[0.44, 0.95, -0.18]}>
+        <cylinderGeometry args={[0.012, 0.016, 0.26, 16]} />
         <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
       </mesh>
-      <group position={[0.56, 1.14, -0.06]} rotation={[-0.3, -0.5, 0]}>
-        <RoundedBox args={[0.34, 0.22, 0.016]} radius={0.012} smoothness={3} castShadow>
+      <group position={[0.46, 1.1, -0.14]} rotation={[-0.3, -0.5, 0]}>
+        <RoundedBox args={[0.28, 0.165, 0.014]} radius={0.01} smoothness={3} castShadow>
           <meshStandardMaterial color={C.rubber} roughness={0.4} metalness={0.2} />
         </RoundedBox>
-        <mesh position={[0, 0, 0.0085]}>
-          <planeGeometry args={[0.31, 0.155]} />
-          <meshBasicMaterial map={screen} toneMapped={false} />
+        <mesh position={[0, 0, 0.0075]}>
+          <planeGeometry args={[0.26, 0.13]} />
+          <meshBasicMaterial map={tex} toneMapped={false} />
         </mesh>
       </group>
     </group>
@@ -237,18 +314,18 @@ function Pedestal() {
   }, 640, 170);
   return (
     <group>
-      <RoundedBox args={[1.1, 0.76, 0.62]} radius={0.03} smoothness={4} position={[0, 0.42, 0]} castShadow receiveShadow>
+      <RoundedBox args={[0.9, 0.72, 0.56]} radius={0.03} smoothness={4} position={[0, 0.4, 0]} castShadow receiveShadow>
         <meshStandardMaterial map={wood} roughness={0.7} />
       </RoundedBox>
-      <RoundedBox args={[1.18, 0.06, 0.7]} radius={0.02} smoothness={3} position={[0, 0.83, 0]} castShadow>
+      <RoundedBox args={[0.96, 0.06, 0.62]} radius={0.02} smoothness={3} position={[0, 0.79, 0]} castShadow>
         <meshStandardMaterial color={C.cream} roughness={0.5} />
       </RoundedBox>
       <mesh position={[0, 0.02, 0]}>
-        <boxGeometry args={[1.0, 0.04, 0.54]} />
+        <boxGeometry args={[0.82, 0.04, 0.48]} />
         <meshStandardMaterial color={C.rubber} roughness={0.9} />
       </mesh>
-      <mesh position={[0, 0.5, 0.312]}>
-        <planeGeometry args={[0.8, 0.21]} />
+      <mesh position={[0, 0.45, 0.282]}>
+        <planeGeometry args={[0.7, 0.185]} />
         <meshStandardMaterial map={plate} roughness={0.4} />
       </mesh>
     </group>
@@ -330,7 +407,11 @@ export default function Station3D({
   hotspotElements,
   spin,
   onReady,
+  kiosk,
+  onPress,
 }: {
+  kiosk: KioskState;
+  onPress: (a: KioskAction) => void;
   selected: StationPartId | null;
   hotspotElements: RefObject<Partial<Record<StationPartId, HTMLButtonElement | null>>>;
   spin: boolean;
@@ -352,16 +433,16 @@ export default function Station3D({
       </Environment>
       <group ref={reg("globe")}>
         <Suspense fallback={null}>
-          <TouchGlobe spin={spin} />
+          <TouchGlobe spin={spin} lng={kiosk.lng} />
         </Suspense>
       </group>
       <Pedestal />
-      <group ref={reg("panel")}><ControlPanel /></group>
+      <group ref={reg("panel")}><ControlPanel state={kiosk} onPress={onPress} /></group>
       <group ref={reg("headphones")}><Headphones /></group>
       <group ref={reg("feedback")}><GlobeFeedback visible={selected === "feedback"} /></group>
       <group ref={reg("tablet")}>
         <Suspense fallback={null}>
-          <Tablet />
+          <Tablet state={kiosk} />
           <ReadyFlag onReady={onReady} />
         </Suspense>
       </group>

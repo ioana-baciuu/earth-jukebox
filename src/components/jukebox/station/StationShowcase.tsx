@@ -7,8 +7,6 @@ import { STATION_PARTS, type StationPartId } from "@/lib/station-parts";
 
 import { joystickMove, type MuseumLayer } from "@/lib/museum-model";
 import { LAYERS } from "@/lib/layers";
-import { describePlace } from "@/lib/places";
-import { sampleEarth } from "@/lib/earth-data";
 import { museumSnapshot } from "@/lib/museum-model";
 import { getEngine } from "@/lib/audio/engine";
 import { coastCrossing } from "@/lib/sonify-map";
@@ -28,23 +26,23 @@ export function StationShowcase() {
   const [ready, setReady] = useState(false);
   const hotspotElements = useRef<Partial<Record<StationPartId, HTMLButtonElement | null>>>({});
   const part = STATION_PARTS.find((p) => p.id === selected);
-  const [kiosk, setKiosk] = useState<KioskState>({ layer: "ocean", lng: -40, lastAction: "nothing yet", pressed: null, pressedAt: 0, tilt: 0 });
+  const [kiosk, setKiosk] = useState<KioskState>({ layer: "ocean", lat: 10, lng: -40, lastAction: "nothing yet", pressed: null, pressedAt: 0, tilt: 0 });
   const press = (a: KioskAction) => {
     {
       const k = kiosk;
       const layer: MuseumLayer = a === "ocean" || a === "storm" || a === "forest" || a === "lights" ? a : k.layer;
-      const lng = a === "west" || a === "east" ? joystickMove({ lat: 0, lng: k.lng }, a === "west" ? -1 : 1).lng : k.lng;
+      const lng = a === "west" || a === "east" ? joystickMove({ lat: k.lat, lng: k.lng }, a === "west" ? -1 : 1).lng : k.lng;
       const label = ACTION_LABEL[a].toUpperCase();
-      const place = describePlace(10, lng, sampleEarth(10, lng).land > 0.5);
-      const msg = a === "where" ? `${place}, ${LAYERS[layer].name}.` : `${ACTION_LABEL[a]}. ${a === "west" || a === "east" ? place : LAYERS[layer].name}.`;
-      announce(msg); say(msg);
-      setKiosk({ layer, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 });
+      const snap = museumSnapshot(layer, k.lat, lng);
+      const msg = a === "where" ? `You are at ${snap.name}. ${LAYERS[layer].name} is selected. ${snap.caption.split('. ').slice(1).join('. ')}` : `${ACTION_LABEL[a]}. ${a === "west" || a === "east" ? snap.name : LAYERS[layer].name}.`;
+      speak(msg); announce(msg); say(msg);
+      setKiosk({ layer, lat: k.lat, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 });
     }
   };
   const touch = async (lat: number, lng: number) => {
     const snap = museumSnapshot(kiosk.layer, lat, lng);
     setTouched(snap.caption);
-    setKiosk((k) => ({ ...k, lng, lastAction: "TOUCHED GLOBE", pressed: null, pressedAt: performance.now(), tilt: 0 }));
+    setKiosk((k) => ({ ...k, lat, lng, lastAction: "TOUCHED GLOBE", pressed: null, pressedAt: performance.now(), tilt: 0 }));
     speak(snap.caption); announce(snap.caption); say(snap.caption);
     const e = await getEngine();
     const crossing = lastLand.current === null ? null : coastCrossing(lastLand.current, snap.sample.land);
@@ -115,7 +113,7 @@ export function StationShowcase() {
                 <Button key={id} size="sm" variant="soft" aria-pressed={kiosk.layer === id} onClick={() => press(id)} className={`layer-${id} aria-pressed:ring-2 aria-pressed:ring-[var(--layer)] whitespace-normal h-auto py-2 text-xs`}>{LAYERS[id].name}</Button>
               ))}
               <Button size="sm" variant="soft" onClick={() => press("west")}>← West</Button>
-              <Button size="sm" variant="layer" className="col-span-2" onClick={() => press("where")}>Where am I?</Button>
+              <Button size="sm" variant="layer" className="col-span-2 h-auto flex-col gap-0 py-2" aria-label="Where am I?" onClick={() => press("where")}><span aria-hidden="true" className="text-lg leading-none">⠦</span><span>Where am I?</span></Button>
               <Button size="sm" variant="soft" onClick={() => press("east")}>East →</Button>
             </div>
           </div>

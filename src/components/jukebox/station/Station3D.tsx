@@ -12,7 +12,7 @@ import night from "@/assets/earth/nasa-night.jpg.asset.json";
 import { solarPosition, type MuseumLayer } from "@/lib/museum-model";
 
 /** What the visitor last did on the 3D station, mirrored on the tablet screen. */
-export type KioskState = { layer: MuseumLayer; lng: number; lastAction: string; pressed: string | null; pressedAt: number; tilt: number };
+export type KioskState = { layer: MuseumLayer; lat: number; lng: number; lastAction: string; pressed: string | null; pressedAt: number; tilt: number };
 export type KioskAction = MuseumLayer | "where" | "west" | "east";
 const LAYER_NAME: Record<MuseumLayer, string> = { ocean: "SEA TEMPERATURE", storm: "LIGHTNING", forest: "FOREST HEIGHT", lights: "NIGHT LIGHTS" };
 import { STATION_PARTS, type StationPartId } from "@/lib/station-parts";
@@ -175,6 +175,13 @@ function ControlPanel({ state, onPress }: { state: KioskState; onPress: (a: Kios
         <RoundedBox args={[0.1, 0.03, 0.08]} radius={0.01}>
           <meshStandardMaterial color={C.pink} roughness={0.4} />
         </RoundedBox>
+        {/* Uncontracted English Braille question mark, dots 2–3–6 (⠦). */}
+        {([[-0.012, 0], [-0.012, 0.018], [0.012, 0.018]] as const).map(([x, z], index) => (
+          <mesh key={index} position={[x, 0.019, z]}>
+            <sphereGeometry args={[0.006, 12, 8]} />
+            <meshStandardMaterial color={C.navy} roughness={0.6} />
+          </mesh>
+        ))}
       </PressKey>
       {/* joystick: east/west slot only. Click the left half for west, right half for east. */}
       <group position={[0.31, 0.028, 0]}>

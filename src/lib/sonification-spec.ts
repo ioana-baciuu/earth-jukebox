@@ -75,6 +75,13 @@ export const ERIE_SPECS: Record<CoreLayerId, ErieSpec> = {
 };
 
 /**
+const ERIE_FOR_LAYER: Partial<Record<LayerId | string, CoreLayerId>> = {
+  ocean: "ocean", waves: "ocean", sea: "ocean",
+  storm: "storm", thunder: "storm", lightning: "storm",
+  forest: "forest", birds: "forest", birdsong: "forest", trees: "forest",
+  lights: "lights", city: "lights", cities: "lights", bells: "lights",
+};
+
 export const erieFor = (layer: string): ErieSpec | null => {
   const id = ERIE_FOR_LAYER[layer];
   return id ? ERIE_SPECS[id] : null;

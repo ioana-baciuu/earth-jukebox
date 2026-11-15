@@ -432,7 +432,7 @@ function Index() {
           {LAYER_IDS.map((id) => {
             const spec = erieFor(id) ?? ERIE_SPECS.ocean;
             return (
-              <li key={id} className="layer-tile flex flex-col gap-2 rounded-2xl p-5" data-layer={id}>
+              <li key={id} className={cn(`layer-${id}`, "layer-tile flex flex-col gap-2 rounded-2xl p-5")}>
                 <span className="inline-flex items-center gap-2 text-xl font-bold"><LayerIcon id={id} className="h-5 w-5 text-layer" />{LAYERS[id].name}</span>
                 <span className="text-base">{spec.legend.low} → {spec.legend.mid} → {spec.legend.high}</span>
                 <span className="text-sm text-muted-foreground">{spec.legend.speechRule}</span>

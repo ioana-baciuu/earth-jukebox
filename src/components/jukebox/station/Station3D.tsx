@@ -9,7 +9,7 @@ import sst from "@/assets/earth/nasa-sst.jpg.asset.json";
 import lightning from "@/assets/earth/nasa-lightning.jpg.asset.json";
 import forestImg from "@/assets/earth/nasa-forest.jpg.asset.json";
 import night from "@/assets/earth/nasa-night.jpg.asset.json";
-import type { MuseumLayer } from "@/lib/museum-model";
+import { solarPosition, type MuseumLayer } from "@/lib/museum-model";
 
 /** What the visitor last did on the 3D station, mirrored on the tablet screen. */
 export type KioskState = { layer: MuseumLayer; lng: number; lastAction: string; pressed: string | null; pressedAt: number; tilt: number };
@@ -36,7 +36,7 @@ const ANCHORS: Record<StationPartId, { label: [number, number, number]; cam: [nu
   panel: { label: [0.05, 0.76, 0.46], cam: [0.15, 1.1, 1.05], target: [0, 0.62, 0.33] },
   headphones: { label: [-0.6, 0.6, 0.1], cam: [-1.2, 1.2, 1.6], target: [-0.3, 0.8, 0.55] },
   feedback: { label: [-0.22, 1.12, 0.34], cam: [0.55, 1.25, 1.2], target: [0, 1.04, 0.04] },
-  tablet: { label: [0.66, 1.06, 0.2], cam: [1.15, 1.05, 1.0], target: [0.62, 0.92, 0.14] },
+  tablet: { label: [0.5, 1.26, 0.2], cam: [0.95, 1.05, 1.0], target: [0.42, 0.92, 0.14] },
 };
 
 function useCanvasTexture(draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void, w = 512, h = 512) {
@@ -72,6 +72,30 @@ function useWood() {
   });
 }
 
+/** Real-time night half: a dark shell that follows the Earth's spin and faces away from today's Sun. */
+function NightSide({ earth }: { earth: RefObject<THREE.Mesh | null> }) {
+  const shell = useRef<THREE.Mesh>(null);
+  const q = useMemo(() => new THREE.Quaternion(), []);
+  const dir = useMemo(() => new THREE.Vector3(), []);
+  const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const tmp = useMemo(() => new THREE.Quaternion(), []);
+  useFrame(() => {
+    if (!shell.current || !earth.current) return;
+    const sun = solarPosition(new Date());
+    const phi = ((sun.lng + 180) * Math.PI) / 180, lat = (sun.lat * Math.PI) / 180;
+    // SphereGeometry local direction for a longitude/latitude, pointed away from the Sun.
+    dir.set(Math.cos(phi) * Math.cos(lat), -Math.sin(lat), -Math.sin(phi) * Math.cos(lat));
+    q.setFromUnitVectors(up, dir);
+    shell.current.quaternion.copy(tmp.copy(earth.current.quaternion).multiply(q));
+  });
+  return (
+    <mesh ref={shell} raycast={() => null}>
+      <sphereGeometry args={[0.363, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      <meshBasicMaterial color="#020414" transparent opacity={0.78} depthWrite={false} side={THREE.FrontSide} />
+    </mesh>
+  );
+}
+
 /** 1 · Tactile touch globe with real NASA skin and relief bump, seated on its cradle. */
 function TouchGlobe({ spin, lng, onTouch }: { spin: boolean; lng: number; onTouch?: ((lat: number, lng: number) => void) | undefined }) {
   const { map, bumpMap } = useTexture({ map: skinDay.url, bumpMap: bump.url });
@@ -93,6 +117,7 @@ function TouchGlobe({ spin, lng, onTouch }: { spin: boolean; lng: number; onTouc
         <sphereGeometry args={[0.36, 96, 64]} />
         <meshStandardMaterial map={map} bumpMap={bumpMap} bumpScale={6} roughness={0.75} metalness={0.02} />
       </mesh>
+      <NightSide earth={earth} />
       {/* cradle */}
       <mesh position={[0, -0.37, 0]}>
         <cylinderGeometry args={[0.13, 0.18, 0.06, 48]} />
@@ -360,11 +385,16 @@ function Tablet({ state }: { state: KioskState }) {
   }, [state, imgs, canvas, tex]);
   return (
     <group>
-      <mesh position={[0.62, 0.95, 0.12]}>
-        <cylinderGeometry args={[0.012, 0.016, 0.26, 16]} />
+      {/* base plate screwed onto the tabletop, then the arm */}
+      <mesh position={[0.4, 0.83, 0.12]}>
+        <cylinderGeometry args={[0.045, 0.05, 0.02, 24]} />
         <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
       </mesh>
-      <group position={[0.62, 1.12, 0.14]} rotation={[-0.25, -0.35, 0]}>
+      <mesh position={[0.4, 0.94, 0.12]}>
+        <cylinderGeometry args={[0.012, 0.016, 0.22, 16]} />
+        <meshStandardMaterial color={C.steel} metalness={0.8} roughness={0.3} />
+      </mesh>
+      <group position={[0.42, 1.12, 0.14]} rotation={[-0.25, -0.45, 0]}>
         <RoundedBox args={[0.28, 0.165, 0.014]} radius={0.01} smoothness={3} castShadow>
           <meshStandardMaterial color={C.rubber} roughness={0.4} metalness={0.2} />
         </RoundedBox>

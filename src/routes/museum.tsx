@@ -177,10 +177,7 @@ function MuseumPage() {
       <p className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5 text-sm font-bold text-muted-foreground">
         <School className="h-4 w-4 text-primary" aria-hidden="true" /> Prototype for museums and schools
       </p>
-       <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">Earth Jukebox museum station</h1>
-      <p className="mt-4 max-w-3xl text-xl text-muted-foreground">
-         CYSA Sphere · A working digital prototype for blind and low-vision explorers.
-      </p>
+      <h1 className="sr-only">Earth Jukebox museum station</h1>
 
 
       <StationShowcase />

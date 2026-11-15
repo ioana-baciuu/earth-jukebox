@@ -22,6 +22,8 @@ export function StationShowcase() {
   const { settings, announce, speak, buzz } = useA11y();
   const lastLand = useRef<number | null>(null);
   const [touched, setTouched] = useState<string | null>(null);
+  const [said, setSaid] = useState<{ text: string; at: number } | null>(null);
+  const say = (text: string) => setSaid({ text, at: Date.now() });
   const [selected, setSelected] = useState<StationPartId | null>(null);
   const [ready, setReady] = useState(false);
   const hotspotElements = useRef<Partial<Record<StationPartId, HTMLButtonElement | null>>>({});
@@ -34,7 +36,8 @@ export function StationShowcase() {
       const lng = a === "west" || a === "east" ? joystickMove({ lat: 0, lng: k.lng }, a === "west" ? -1 : 1).lng : k.lng;
       const label = ACTION_LABEL[a].toUpperCase();
       const place = describePlace(10, lng, sampleEarth(10, lng).land > 0.5);
-      announce(a === "where" ? `${place}, ${LAYERS[layer].name}.` : `${ACTION_LABEL[a]}. ${a === "west" || a === "east" ? place : LAYERS[layer].name}.`);
+      const msg = a === "where" ? `${place}, ${LAYERS[layer].name}.` : `${ACTION_LABEL[a]}. ${a === "west" || a === "east" ? place : LAYERS[layer].name}.`;
+      announce(msg); say(msg);
       setKiosk({ layer, lng, lastAction: label, pressed: a, pressedAt: performance.now(), tilt: a === "west" ? -1 : a === "east" ? 1 : 0 });
     }
   };
@@ -42,7 +45,7 @@ export function StationShowcase() {
     const snap = museumSnapshot(kiosk.layer, lat, lng);
     setTouched(snap.caption);
     setKiosk((k) => ({ ...k, lng, lastAction: "TOUCHED GLOBE", pressed: null, pressedAt: performance.now(), tilt: 0 }));
-    speak(snap.caption); announce(snap.caption);
+    speak(snap.caption); announce(snap.caption); say(snap.caption);
     const e = await getEngine();
     const crossing = lastLand.current === null ? null : coastCrossing(lastLand.current, snap.sample.land);
     lastLand.current = snap.sample.land;
@@ -54,7 +57,8 @@ export function StationShowcase() {
   const select = (id: StationPartId | null) => {
     setSelected(id);
     const p = STATION_PARTS.find((x) => x.id === id);
-    announce(p ? `${p.n}. ${p.title}. ${p.text}` : "Whole station view.");
+    const msg = p ? `${p.n}. ${p.title}. ${p.text}` : "Whole station view.";
+    announce(msg); say(msg);
   };
   return (
     <section aria-labelledby="station3d-title" className="mt-14">
@@ -75,6 +79,15 @@ export function StationShowcase() {
               <Station3D onTouch={touch} kiosk={kiosk} onPress={press} selected={selected} hotspotElements={hotspotElements} spin={!settings.calmMotion} onReady={() => setReady(true)} />
             </Suspense>
           </ClientOnly>
+          {said && (
+            <div key={said.at} className="pointer-events-none absolute left-1/2 top-4 z-10 w-[min(92%,36rem)] -translate-x-1/2 animate-in fade-in slide-in-from-top-2" aria-hidden="true">
+              <div className="relative rounded-2xl border-2 border-primary bg-card/95 px-4 py-3 text-base shadow-lg">
+                <span className="font-bold text-primary">System: </span>
+                <span className="text-card-foreground">"{said.text}"</span>
+                <span className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-primary bg-card" />
+              </div>
+            </div>
+          )}
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
             {STATION_PARTS.map((p) => (
               <Button

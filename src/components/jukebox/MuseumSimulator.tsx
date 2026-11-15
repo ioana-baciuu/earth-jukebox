@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Headphones, RotateCcw, Square, Sun, Moon, Thermometer, Volume2, Music4, Gamepad2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Headphones, RotateCcw, Square, Sun, Moon, Thermometer, Volume2, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import skinDay from "@/assets/earth/skin-day.jpg.asset.json";
 import skinLights from "@/assets/earth/skin-lights.jpg.asset.json";
@@ -97,7 +97,6 @@ export function MuseumSimulator() {
         <Button size="xl" variant="layer" onClick={()=>void play()}><Volume2/>Where am I?</Button>
         <Button size="iconLg" variant="soft" aria-label="Stop kiosk sound" onClick={stop}><Square/></Button>
         <Button size="iconLg" variant="soft" aria-label="Reset museum kiosk" onClick={()=>{stop();setLayer("ocean");setPosition({lat:30,lng:-75});setValue(undefined);setOrchestra(false);globe.current?.flyTo(30,-75);}}><RotateCcw/></Button>
-        <Button variant="soft" aria-pressed={orchestra} onClick={()=>{setOrchestra(v=>!v);}}><Music4/>{orchestra?"Four instruments on":"Orchestra"}</Button>
       </div>
     </div>
     <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">Software demonstrator · Touch sensors, raised relief, physical LEDs and heating, cooling and vibration beneath the globe’s surface are proposed hardware, not connected devices. Sensations would be felt at the globe touch point, not on a separate pad, and require child-safe engineering and testing. Daylight is calculated from the current clock; NASA frames are historical.</p>
